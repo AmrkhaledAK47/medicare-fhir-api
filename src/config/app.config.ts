@@ -13,4 +13,12 @@ export default registerAs('app', () => ({
     fhir: {
         serverBaseUrl: process.env.FHIR_SERVER_BASE_URL || 'http://localhost:9090/fhir',
     },
+    email: {
+        service: process.env.EMAIL_SERVICE || 'gmail',
+        host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.EMAIL_PORT || '587', 10),
+        user: process.env.EMAIL_USER,
+        password: process.env.EMAIL_PASSWORD,
+        from: process.env.EMAIL_FROM || 'MediCare <noreply@medicare.com>',
+    },
 })); 

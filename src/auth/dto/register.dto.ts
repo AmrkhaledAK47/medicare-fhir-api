@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, MinLength, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, Matches } from 'class-validator';
 
 export class RegisterDto {
     @ApiProperty({
-        description: 'User name',
+        description: 'User full name',
         example: 'John Doe'
     })
     @IsString()
-    @IsNotEmpty({ message: 'Name is required' })
+    @IsNotEmpty({ message: 'Full name is required' })
     name: string;
 
     @ApiProperty({
@@ -30,4 +30,30 @@ export class RegisterDto {
     })
     @IsNotEmpty({ message: 'Password is required' })
     password: string;
+
+    @ApiProperty({
+        description: 'Repeat password for confirmation',
+        example: 'Password123!'
+    })
+    @IsString()
+    @IsNotEmpty({ message: 'Password confirmation is required' })
+    repeatPassword: string;
+
+    @ApiProperty({
+        description: 'Access code for registration (required for patient and practitioner accounts)',
+        example: 'ABC123XYZ',
+        required: false
+    })
+    @IsString()
+    @IsOptional()
+    accessCode?: string;
+
+    @ApiProperty({
+        description: 'Phone number',
+        example: '+1234567890',
+        required: false
+    })
+    @IsString()
+    @IsOptional()
+    phone?: string;
 } 

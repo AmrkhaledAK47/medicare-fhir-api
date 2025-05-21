@@ -1,0 +1,13 @@
+hapi:
+  fhir:
+    # Enable validation
+    validation:
+      enabled: true
+    # Set the server to allow for easier development and testing
+    narrative:
+      serverBaseUrl: "http://localhost:9090/fhir"
+    # Allow cross-origin requests for development
+    cors:
+      allow_credentials: true
+      allowed_origin:
+        - "*" 

@@ -1,43 +1,83 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { User } from '../../users/schemas/user.schema';
 
-export enum FhirResourceType {
-    PATIENT = 'Patient',
-    PRACTITIONER = 'Practitioner',
-    OBSERVATION = 'Observation',
-    MEDICATION = 'Medication',
-    CONDITION = 'Condition',
-    ORGANIZATION = 'Organization',
-    ENCOUNTER = 'Encounter',
-    PROCEDURE = 'Procedure',
-    DIAGNOSTIC_REPORT = 'DiagnosticReport',
-    CARE_PLAN = 'CarePlan',
-}
+export type FhirResourceType =
+    | 'Patient'
+    | 'Practitioner'
+    | 'Organization'
+    | 'Encounter'
+    | 'Observation'
+    | 'DiagnosticReport'
+    | 'Medication'
+    | 'MedicationRequest'
+    | 'Condition'
+    | 'Procedure'
+    | 'Immunization'
+    | 'AllergyIntolerance'
+    | 'CarePlan'
+    | 'Goal'
+    | 'Questionnaire'
+    | 'QuestionnaireResponse'
+    | 'PaymentNotice';
 
-@Schema({ timestamps: true })
-export class FhirResource extends Document {
-    @Prop({
-        required: true,
-        enum: Object.values(FhirResourceType),
-        index: true,
-    })
+export type FhirResourceDocument = FhirResource & Document;
+
+// Define the resource types as an array for enum validation
+const RESOURCE_TYPES = [
+    'Patient',
+    'Practitioner',
+    'Organization',
+    'Encounter',
+    'Observation',
+    'DiagnosticReport',
+    'Medication',
+    'MedicationRequest',
+    'Condition',
+    'Procedure',
+    'Immunization',
+    'AllergyIntolerance',
+    'CarePlan',
+    'Goal',
+    'Questionnaire',
+    'QuestionnaireResponse',
+    'PaymentNotice'
+];
+
+@Schema({
+    timestamps: true,
+    collection: 'fhir_resources',
+})
+export class FhirResource {
+    @Prop({ required: true, enum: RESOURCE_TYPES })
     resourceType: FhirResourceType;
 
-    @Prop({ required: true, index: true })
+    @Prop({ required: true })
     resourceId: string;
 
-    @Prop({ type: Object, required: true })
-    data: Record<string, any>;
+    @Prop({ type: MongooseSchema.Types.Mixed, required: true })
+    data: any;
 
-    @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
-    userId: User;
+    @Prop({ type: String })
+    userId?: string;
 
     @Prop({ required: true })
     version: string;
 
     @Prop({ required: true })
     lastUpdated: Date;
+
+    /**
+     * Convert to FHIR format
+     */
+    toFhirResource(): any {
+        return this.data;
+    }
 }
 
-export const FhirResourceSchema = SchemaFactory.createForClass(FhirResource); 
+export const FhirResourceSchema = SchemaFactory.createForClass(FhirResource);
+
+// Create compound index for efficient lookups
+FhirResourceSchema.index({ resourceType: 1, resourceId: 1 }, { unique: true });
+
+// Create index for user-based queries
+FhirResourceSchema.index({ userId: 1 }); 

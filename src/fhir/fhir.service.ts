@@ -1,23 +1,35 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { FhirResource, FhirResourceType } from './schemas/fhir-resource.schema';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { UserRole } from '../users/schemas/user.schema';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { ResourceRegistryService } from './services/resource-registry.service';
 
 @Injectable()
 export class FhirService {
     private readonly baseUrl: string;
     private readonly maxRetries: number;
     private readonly retryDelay: number;
+    private readonly logger = new Logger(FhirService.name);
+    private readonly hapiFhirUrl: string;
+    private readonly useHapiFhir: boolean;
 
     constructor(
         @InjectModel(FhirResource.name) private fhirResourceModel: Model<FhirResource>,
         private configService: ConfigService,
+        private readonly httpService: HttpService,
+        private readonly resourceRegistry: ResourceRegistryService,
     ) {
         this.baseUrl = this.configService.get<string>('app.fhir.serverBaseUrl');
         this.maxRetries = 3; // Max number of retries for failed requests
         this.retryDelay = 1000; // Delay between retries in ms
+        this.hapiFhirUrl = this.configService.get<string>('HAPI_FHIR_URL') || 'http://localhost:9090/fhir';
+        this.useHapiFhir = this.configService.get<boolean>('USE_HAPI_FHIR') || false;
+        this.logger.log(`FHIR Service initialized. HAPI FHIR URL: ${this.hapiFhirUrl}, Using HAPI: ${this.useHapiFhir}`);
     }
 
     private getRequestConfig(): AxiosRequestConfig {
@@ -87,6 +99,52 @@ export class FhirService {
 
         console.error(`${errorMessage} (${operation})`, error);
         return new InternalServerErrorException(errorMessage);
+    }
+
+    // Check if user has access to a specific resource
+    private async checkResourceAccess(resourceType: string, resourceId: string, user: any): Promise<boolean> {
+        // Admin has access to everything
+        if (user.role === UserRole.ADMIN) {
+            return true;
+        }
+
+        // For patients, check if resource belongs to them
+        if (user.role === UserRole.PATIENT) {
+            // If resource type is Patient, check if it's their own record
+            if (resourceType === 'Patient' && user.fhirResourceId === resourceId) {
+                return true;
+            }
+
+            // Check if resource is linked to the patient
+            const resource = await this.getResource(resourceType, resourceId);
+
+            // Check subject reference for patient
+            if (resource.subject?.reference === `Patient/${user.fhirResourceId}`) {
+                return true;
+            }
+
+            // Check patient reference
+            if (resource.patient?.reference === `Patient/${user.fhirResourceId}`) {
+                return true;
+            }
+
+            return false;
+        }
+
+        // For practitioners, check if they have access to this patient's data
+        if (user.role === UserRole.PRACTITIONER) {
+            // Practitioners can view their own profile
+            if (resourceType === 'Practitioner' && user.fhirResourceId === resourceId) {
+                return true;
+            }
+
+            // Practitioners can generally access patient data they are caring for
+            // In a real system, you'd have a more sophisticated access control check
+            // based on care relationships, encounters, etc.
+            return true;
+        }
+
+        return false;
     }
 
     // Create a new FHIR resource
@@ -160,6 +218,18 @@ export class FhirService {
         }
     }
 
+    // Get resource with permission check
+    async getResourceWithPermissionCheck(resourceType: string, id: string, user: any): Promise<any> {
+        // Check if user has access to this resource
+        const hasAccess = await this.checkResourceAccess(resourceType, id, user);
+
+        if (!hasAccess) {
+            throw new ForbiddenException('You do not have permission to access this resource');
+        }
+
+        return this.getResource(resourceType, id);
+    }
+
     // Update an existing FHIR resource
     async updateResource(resourceType: string, id: string, data: any): Promise<any> {
         try {
@@ -190,6 +260,18 @@ export class FhirService {
             console.error(`Error updating FHIR resource ${resourceType}/${id}:`, error);
             throw error;
         }
+    }
+
+    // Update resource with permission check
+    async updateResourceWithPermissionCheck(resourceType: string, id: string, data: any, user: any): Promise<any> {
+        // Check if user has access to update this resource
+        const hasAccess = await this.checkResourceAccess(resourceType, id, user);
+
+        if (!hasAccess) {
+            throw new ForbiddenException('You do not have permission to update this resource');
+        }
+
+        return this.updateResource(resourceType, id, data);
     }
 
     // Delete a FHIR resource
@@ -233,6 +315,35 @@ export class FhirService {
         }
     }
 
+    // Search resources with permission check
+    async searchResourcesWithPermissionCheck(resourceType: string, params: Record<string, string>, user: any): Promise<any> {
+        // For patients, automatically filter results to only include their resources
+        if (user.role === UserRole.PATIENT && user.fhirResourceId) {
+            // Add patient filter for relevant resource types
+            if (resourceType === 'Observation' || resourceType === 'DiagnosticReport' ||
+                resourceType === 'Encounter' || resourceType === 'Procedure' ||
+                resourceType === 'CarePlan' || resourceType === 'Condition') {
+                params = {
+                    ...params,
+                    patient: user.fhirResourceId
+                };
+            }
+
+            // For Patient resource type, only allow searching their own record
+            if (resourceType === 'Patient') {
+                params = {
+                    ...params,
+                    _id: user.fhirResourceId
+                };
+            }
+        }
+
+        // For practitioners, they generally have access to patient data they're caring for
+        // In a real system, you might filter by practitioner ID for certain resources
+
+        return this.searchResources(resourceType, params);
+    }
+
     // Get resources associated with a specific user
     async getUserResources(userId: string): Promise<FhirResource[]> {
         return this.fhirResourceModel.find({ userId }).exec();
@@ -255,5 +366,159 @@ export class FhirService {
     // Get the base URL of the FHIR server
     getBaseUrl(): string {
         return this.baseUrl;
+    }
+
+    /**
+     * Get the appropriate data source for a resource type
+     * @param resourceType FHIR resource type
+     * @returns 'local' or 'remote'
+     */
+    getDataSource(resourceType: string): 'local' | 'remote' {
+        // Check if resource exists in local registry
+        const hasLocalSchema = this.resourceRegistry.hasServiceForResourceType(resourceType);
+
+        // If we have a local schema and aren't forced to use HAPI, use local
+        if (hasLocalSchema && !this.useHapiFhir) {
+            return 'local';
+        }
+
+        // Otherwise use remote HAPI FHIR
+        return 'remote';
+    }
+
+    /**
+     * Search FHIR resources in the HAPI FHIR server
+     */
+    async searchFhirResources(
+        resourceType: string,
+        params: Record<string, any> = {},
+        pagination = { page: 1, count: 10 }
+    ): Promise<any> {
+        try {
+            // Create URL search params
+            const queryParams = new URLSearchParams();
+
+            // Add search parameters
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    queryParams.append(key, String(value));
+                }
+            });
+
+            // Add pagination parameters
+            queryParams.append('_count', String(pagination.count));
+            queryParams.append('_getpagesoffset', String((pagination.page - 1) * pagination.count));
+
+            // Make request to HAPI FHIR server
+            const response = await firstValueFrom(
+                this.httpService.get(`${this.hapiFhirUrl}/${resourceType}`, {
+                    params: queryParams,
+                })
+            );
+
+            return response.data as any;
+        } catch (error) {
+            const axiosError = error as AxiosError;
+            this.logger.error(
+                `Failed to search FHIR resources: ${axiosError.message}`,
+                axiosError.stack,
+            );
+            throw new Error(`Failed to search FHIR resources: ${axiosError.message}`);
+        }
+    }
+
+    /**
+     * Get resource by ID from HAPI FHIR server
+     */
+    async getFhirResourceById(resourceType: string, id: string): Promise<any> {
+        try {
+            const response = await firstValueFrom(
+                this.httpService.get(`${this.hapiFhirUrl}/${resourceType}/${id}`)
+            );
+            return response.data as any;
+        } catch (error) {
+            const axiosError = error as AxiosError;
+            this.logger.error(
+                `Failed to get FHIR resource: ${axiosError.message}`,
+                axiosError.stack,
+            );
+            throw new Error(`Failed to get FHIR resource: ${axiosError.message}`);
+        }
+    }
+
+    /**
+     * Create resource in HAPI FHIR server
+     */
+    async createFhirResource(resourceType: string, data: any): Promise<any> {
+        try {
+            const response = await firstValueFrom(
+                this.httpService.post(`${this.hapiFhirUrl}/${resourceType}`, data)
+            );
+            return response.data as any;
+        } catch (error) {
+            const axiosError = error as AxiosError;
+            this.logger.error(
+                `Failed to create FHIR resource: ${axiosError.message}`,
+                axiosError.stack,
+            );
+            throw new Error(`Failed to create FHIR resource: ${axiosError.message}`);
+        }
+    }
+
+    /**
+     * Update resource in HAPI FHIR server
+     */
+    async updateFhirResource(resourceType: string, id: string, data: any): Promise<any> {
+        try {
+            // Ensure ID is present in the resource
+            data.id = id;
+
+            const response = await firstValueFrom(
+                this.httpService.put(`${this.hapiFhirUrl}/${resourceType}/${id}`, data)
+            );
+            return response.data as any;
+        } catch (error) {
+            const axiosError = error as AxiosError;
+            this.logger.error(
+                `Failed to update FHIR resource: ${axiosError.message}`,
+                axiosError.stack,
+            );
+            throw new Error(`Failed to update FHIR resource: ${axiosError.message}`);
+        }
+    }
+
+    /**
+     * Delete resource in HAPI FHIR server
+     */
+    async deleteFhirResource(resourceType: string, id: string): Promise<any> {
+        try {
+            const response = await firstValueFrom(
+                this.httpService.delete(`${this.hapiFhirUrl}/${resourceType}/${id}`)
+            );
+            return response.data as any;
+        } catch (error) {
+            const axiosError = error as AxiosError;
+            this.logger.error(
+                `Failed to delete FHIR resource: ${axiosError.message}`,
+                axiosError.stack,
+            );
+            throw new Error(`Failed to delete FHIR resource: ${axiosError.message}`);
+        }
+    }
+
+    /**
+     * Check HAPI FHIR server health
+     */
+    async checkFhirServerHealth(): Promise<boolean> {
+        try {
+            // Try to access the server metadata
+            await firstValueFrom(
+                this.httpService.get(`${this.hapiFhirUrl}/metadata`)
+            );
+            return true;
+        } catch (error) {
+            this.logger.error('HAPI FHIR server health check failed', error);
+            return false;
+        }
     }
 } 
