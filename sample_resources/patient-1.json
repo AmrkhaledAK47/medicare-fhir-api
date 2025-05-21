@@ -1,0 +1,92 @@
+{
+    "resourceType": "Patient",
+    "id": "example-patient-1",
+    "meta": {
+        "versionId": "1",
+        "lastUpdated": "2023-10-18T14:00:00Z"
+    },
+    "identifier": [
+        {
+            "system": "http://ehr-fhir-platform.org/identifiers/patients",
+            "value": "PAT001"
+        },
+        {
+            "system": "http://hl7.org/fhir/sid/us-ssn",
+            "value": "999-88-7777"
+        }
+    ],
+    "active": true,
+    "name": [
+        {
+            "use": "official",
+            "family": "Wilson",
+            "given": [
+                "Emily",
+                "Jane"
+            ]
+        }
+    ],
+    "telecom": [
+        {
+            "system": "phone",
+            "value": "+1 (555) 765-4321",
+            "use": "home"
+        },
+        {
+            "system": "email",
+            "value": "emily.wilson@example.com",
+            "use": "home"
+        }
+    ],
+    "gender": "female",
+    "birthDate": "1985-02-20",
+    "address": [
+        {
+            "use": "home",
+            "type": "physical",
+            "line": [
+                "456 Residential Avenue",
+                "Apt 302"
+            ],
+            "city": "Medical City",
+            "state": "CA",
+            "postalCode": "90210",
+            "country": "USA"
+        }
+    ],
+    "maritalStatus": {
+        "coding": [
+            {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+                "code": "M",
+                "display": "Married"
+            }
+        ],
+        "text": "Married"
+    },
+    "communication": [
+        {
+            "language": {
+                "coding": [
+                    {
+                        "system": "urn:ietf:bcp:47",
+                        "code": "en",
+                        "display": "English"
+                    }
+                ],
+                "text": "English"
+            },
+            "preferred": true
+        }
+    ],
+    "generalPractitioner": [
+        {
+            "reference": "Practitioner/example-practitioner-1",
+            "display": "Dr. Sarah Johnson"
+        }
+    ],
+    "managingOrganization": {
+        "reference": "Organization/example-organization",
+        "display": "ACME Health System"
+    }
+}

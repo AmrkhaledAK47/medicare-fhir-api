@@ -1,0 +1,88 @@
+{
+    "resourceType": "Patient",
+    "id": "example",
+    "text": {
+        "status": "generated",
+        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">John Smith</div>"
+    },
+    "active": true,
+    "name": [
+        {
+            "use": "official",
+            "family": "Smith",
+            "given": [
+                "John"
+            ]
+        }
+    ],
+    "telecom": [
+        {
+            "system": "phone",
+            "value": "555-123-4567",
+            "use": "home"
+        },
+        {
+            "system": "email",
+            "value": "john.smith@example.com",
+            "use": "home"
+        }
+    ],
+    "gender": "male",
+    "birthDate": "1970-01-25",
+    "address": [
+        {
+            "use": "home",
+            "line": [
+                "123 Main St"
+            ],
+            "city": "Anytown",
+            "state": "CA",
+            "postalCode": "94123",
+            "country": "USA"
+        }
+    ],
+    "contact": [
+        {
+            "relationship": [
+                {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v2-0131",
+                            "code": "N",
+                            "display": "Next of Kin"
+                        }
+                    ]
+                }
+            ],
+            "name": {
+                "use": "official",
+                "family": "Smith",
+                "given": [
+                    "Jane"
+                ]
+            },
+            "telecom": [
+                {
+                    "system": "phone",
+                    "value": "555-987-6543",
+                    "use": "mobile"
+                }
+            ]
+        }
+    ],
+    "communication": [
+        {
+            "language": {
+                "coding": [
+                    {
+                        "system": "urn:ietf:bcp:47",
+                        "code": "en",
+                        "display": "English"
+                    }
+                ],
+                "text": "English"
+            },
+            "preferred": true
+        }
+    ]
+}

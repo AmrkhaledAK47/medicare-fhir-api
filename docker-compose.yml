@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  hapi-fhir-server:
+    image: hapiproject/hapi:latest
+    container_name: hapi-fhir-server
+    ports:
+      - "9090:8080"
+    environment:
+      - hapi.fhir.default_encoding=json
+      - hapi.fhir.allow_external_references=true
+      - hapi.fhir.allow_multiple_delete=true
+      - hapi.fhir.expunge_enabled=true
+      - hapi.fhir.subscription.resthook_enabled=true
+    volumes:
+      - hapi-data:/data/hapi
+    networks:
+      - fhir-net
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=fhir_ehr
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - fhir-net
+
+networks:
+  fhir-net:
+    driver: bridge
+
+volumes:
+  hapi-data:
+  mongodb-data:
