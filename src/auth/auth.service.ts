@@ -52,16 +52,24 @@ export class AuthService {
         }
 
         try {
-            // If access code is provided, we're completing registration for a pre-created account
+            // Check if this is the first user being created (first admin exception)
+            const userCount = await this.usersService.countUsers();
+
+            // If access code is not provided and this isn't the first user, reject
+            if (!accessCode && userCount > 0) {
+                throw new BadRequestException('Access code is required for registration');
+            }
+
+            // If access code is provided, verify it
             if (accessCode) {
-                // This will validate the access code and update the user
+                // This will validate the access code and get the pre-created user
                 await this.usersService.verifyAccessCode(email, accessCode);
             }
 
             const user = await this.usersService.create(registerDto);
             return this.generateToken(user);
         } catch (error) {
-            if (error instanceof ConflictException || error instanceof BadRequestException) {
+            if (error instanceof ConflictException || error instanceof BadRequestException || error instanceof NotFoundException) {
                 throw error; // Re-throw validation errors
             }
             throw new InternalServerErrorException('Failed to create user account');

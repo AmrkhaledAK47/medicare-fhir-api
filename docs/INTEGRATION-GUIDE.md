@@ -2,8 +2,8 @@
 
 ## Overview
 
-This guide provides instructions for integrating with the MediCare FHIR API. Our API uses the HL7 FHIR R4 standard to provide access to healthcare data with role-based permissions.
-
+This guide provides instructions for integrating with the MediCare FHIR API. Our API uses the HL7 FHIR R4 standard to provide access to healthcare ata with role-based permissions.
+d
 ## Getting Started
 
 ### Base URLs

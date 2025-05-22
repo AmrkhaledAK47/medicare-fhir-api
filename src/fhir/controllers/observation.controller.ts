@@ -1,78 +1,220 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, UseGuards, Req, Query, Param, Body } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import { BaseResourceController } from '../controllers/base-resource.controller';
+import { HapiFhirAdapter } from '../adapters/hapi-fhir.adapter';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { RolesGuard, Role, Action } from '../../auth/guards/roles.guard';
-import { Roles, ResourcePermission } from '../../auth/decorators/roles.decorator';
-import { ObservationService } from '../services/observation.service';
-
+import { RolesGuard, Role } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { Request } from 'express';
 
 @ApiTags('observations')
-@Controller('observations')
+@Controller('fhir/Observation')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
-export class ObservationController {
-    constructor(private readonly observationService: ObservationService) { }
+export class ObservationController extends BaseResourceController {
+    constructor(protected readonly hapiFhirAdapter: HapiFhirAdapter) {
+        super(hapiFhirAdapter, 'Observation');
+    }
 
-    @Get()
-    @ApiOperation({ summary: 'Get all observations with pagination' })
-    @ApiQuery({ name: 'page', required: false, description: 'Page number' })
-    @ApiQuery({ name: 'limit', required: false, description: 'Items per page' })
-    @ApiQuery({ name: 'patientId', required: false, description: 'Filter by patient ID' })
-    @ApiResponse({ status: 200, description: 'List of observations' })
-    async findAll(
-        @Query('page') page = 1,
-        @Query('limit') limit = 10,
-        @Query('patientId') patientId?: string,
-    ) {
-        // If patientId is provided, filter by patient
-        if (patientId) {
-            return this.observationService.findByPatientId(patientId);
+    /**
+     * Get observations by code (e.g., vital signs, lab results)
+     */
+    @Get('$by-code')
+    @ApiOperation({ summary: 'Search observations by code' })
+    @ApiResponse({ status: 200, description: 'Observations retrieved successfully' })
+    @Roles(Role.PRACTITIONER, Role.ADMIN, Role.PATIENT)
+    async getObservationsByCode(
+        @Query('code') code: string,
+        @Query() query: Record<string, any>,
+    ): Promise<any> {
+        if (!code) {
+            throw new Error('Code parameter is required');
         }
 
-        // Otherwise use standard pagination
-        return this.observationService.findAll({
-            page: +page,
-            limit: +limit,
-        });
+        const params = {
+            ...query,
+            code,
+        };
+
+        return this.hapiFhirAdapter.search('Observation', params);
     }
 
-    @Get(':id')
-    @ApiOperation({ summary: 'Get observation by ID' })
-    @ApiParam({ name: 'id', description: 'Observation ID' })
-    @ApiResponse({ status: 200, description: 'The observation' })
-    @ApiResponse({ status: 404, description: 'Observation not found' })
-    async findOne(@Param('id') id: string) {
-        return this.observationService.findById(id);
+    /**
+     * Get observations for a specific patient
+     */
+    @Get('patient/:patientId')
+    @ApiOperation({ summary: 'Get observations for a specific patient' })
+    @ApiParam({ name: 'patientId', description: 'Patient ID' })
+    @ApiResponse({ status: 200, description: 'Observations retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'Patient not found' })
+    @Roles(Role.PRACTITIONER, Role.ADMIN)
+    async getPatientObservations(
+        @Param('patientId') patientId: string,
+        @Query() query: Record<string, any>,
+    ): Promise<any> {
+        // Verify the patient exists
+        await this.hapiFhirAdapter.getById('Patient', patientId);
+
+        const params = {
+            ...query,
+            'subject': `Patient/${patientId}`,
+        };
+
+        return this.hapiFhirAdapter.search('Observation', params);
     }
 
+    /**
+     * Get the latest observation of a specific type for a patient
+     */
+    @Get('patient/:patientId/latest')
+    @ApiOperation({ summary: 'Get latest observation of a specific type for a patient' })
+    @ApiParam({ name: 'patientId', description: 'Patient ID' })
+    @ApiResponse({ status: 200, description: 'Latest observation retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'No observations found' })
+    @Roles(Role.PRACTITIONER, Role.ADMIN, Role.PATIENT)
+    async getLatestObservation(
+        @Param('patientId') patientId: string,
+        @Query('code') code: string,
+        @Query() query: Record<string, any>,
+    ): Promise<any> {
+        if (!code) {
+            throw new Error('Code parameter is required');
+        }
+
+        // Verify the patient exists
+        await this.hapiFhirAdapter.getById('Patient', patientId);
+
+        const params = {
+            ...query,
+            'subject': `Patient/${patientId}`,
+            'code': code,
+            '_sort': '-date', // Sort by date descending
+            '_count': '1', // Limit to 1 result
+        };
+
+        const result = await this.hapiFhirAdapter.search('Observation', params);
+
+        if (!result.entry || result.entry.length === 0) {
+            throw new Error('No observations found for the specified criteria');
+        }
+
+        return result.entry[0].resource;
+    }
+
+    /**
+     * Get vital signs for a patient
+     */
+    @Get('patient/:patientId/vitals')
+    @ApiOperation({ summary: 'Get vital signs for a patient' })
+    @ApiParam({ name: 'patientId', description: 'Patient ID' })
+    @ApiResponse({ status: 200, description: 'Vital signs retrieved successfully' })
+    @Roles(Role.PRACTITIONER, Role.ADMIN, Role.PATIENT)
+    async getVitalSigns(
+        @Param('patientId') patientId: string,
+        @Query() query: Record<string, any>,
+    ): Promise<any> {
+        // Verify the patient exists
+        await this.hapiFhirAdapter.getById('Patient', patientId);
+
+        const params = {
+            ...query,
+            'subject': `Patient/${patientId}`,
+            'category': 'vital-signs',
+        };
+
+        return this.hapiFhirAdapter.search('Observation', params);
+    }
+
+    /**
+     * Get lab results for a patient
+     */
+    @Get('patient/:patientId/labs')
+    @ApiOperation({ summary: 'Get lab results for a patient' })
+    @ApiParam({ name: 'patientId', description: 'Patient ID' })
+    @ApiResponse({ status: 200, description: 'Lab results retrieved successfully' })
+    @Roles(Role.PRACTITIONER, Role.ADMIN, Role.PATIENT)
+    async getLabResults(
+        @Param('patientId') patientId: string,
+        @Query() query: Record<string, any>,
+    ): Promise<any> {
+        // Verify the patient exists
+        await this.hapiFhirAdapter.getById('Patient', patientId);
+
+        const params = {
+            ...query,
+            'subject': `Patient/${patientId}`,
+            'category': 'laboratory',
+        };
+
+        return this.hapiFhirAdapter.search('Observation', params);
+    }
+
+    /**
+     * Create a new observation
+     */
     @Post()
-    @Roles(Role.ADMIN, Role.PRACTITIONER)
-    @ApiOperation({ summary: 'Create new observation' })
+    @ApiOperation({ summary: 'Create a new observation' })
+    @ApiBody({ description: 'Observation resource' })
     @ApiResponse({ status: 201, description: 'Observation created successfully' })
-    @ApiResponse({ status: 403, description: 'Forbidden' })
-    async create(@Body() data: any) {
-        return this.observationService.create(data);
+    @ApiResponse({ status: 400, description: 'Invalid observation data' })
+    @Roles(Role.PRACTITIONER, Role.ADMIN)
+    async createObservation(@Body() data: any): Promise<any> {
+        // Ensure we have a valid Observation resource
+        if (!data.resourceType || data.resourceType !== 'Observation') {
+            throw new Error('Invalid observation data. Expected Observation resource.');
+        }
+
+        // Validate the observation according to FHIR rules
+        // You might want to add additional validation here
+
+        return this.hapiFhirAdapter.create('Observation', data);
     }
 
-    @Put(':id')
-    @Roles(Role.ADMIN, Role.PRACTITIONER)
-    @ApiOperation({ summary: 'Update observation by ID' })
-    @ApiParam({ name: 'id', description: 'Observation ID' })
-    @ApiResponse({ status: 200, description: 'Observation updated successfully' })
-    @ApiResponse({ status: 403, description: 'Forbidden' })
-    @ApiResponse({ status: 404, description: 'Observation not found' })
-    async update(@Param('id') id: string, @Body() data: any) {
-        return this.observationService.update(id, data);
-    }
+    /**
+     * Override transformQueryParams to add observation-specific search parameter handling
+     */
+    protected transformQueryParams(params: any): Record<string, string> {
+        const searchParams = super.transformQueryParams(params);
 
-    @Delete(':id')
-    @Roles(Role.ADMIN)
-    @ApiOperation({ summary: 'Delete observation by ID' })
-    @ApiParam({ name: 'id', description: 'Observation ID' })
-    @ApiResponse({ status: 200, description: 'Observation deleted successfully' })
-    @ApiResponse({ status: 403, description: 'Forbidden - requires admin privileges' })
-    @ApiResponse({ status: 404, description: 'Observation not found' })
-    async remove(@Param('id') id: string) {
-        return this.observationService.remove(id);
+        // Handle date range searches
+        if (params.date) {
+            searchParams.date = params.date;
+        } else {
+            if (params.date_start) {
+                searchParams['date'] = `ge${params.date_start}`;
+            }
+            if (params.date_end) {
+                if (searchParams['date']) {
+                    searchParams['date'] += `,le${params.date_end}`;
+                } else {
+                    searchParams['date'] = `le${params.date_end}`;
+                }
+            }
+        }
+
+        // Handle value range searches
+        if (params.value_min || params.value_max) {
+            let valueRange = '';
+            if (params.value_min) {
+                valueRange += `ge${params.value_min}`;
+            }
+            if (params.value_max) {
+                if (valueRange) {
+                    valueRange += `,le${params.value_max}`;
+                } else {
+                    valueRange = `le${params.value_max}`;
+                }
+            }
+            if (valueRange) {
+                searchParams['value-quantity'] = valueRange;
+            }
+        }
+
+        // Handle status filter
+        if (params.status && Array.isArray(params.status)) {
+            searchParams.status = params.status.join(',');
+        }
+
+        return searchParams;
     }
 } 

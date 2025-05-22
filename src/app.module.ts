@@ -8,6 +8,9 @@ import { UsersModule } from './users/users.module';
 import { FhirModule } from './fhir/fhir.module';
 import { HealthModule } from './health/health.module';
 import { EmailModule } from './email/email.module';
+import { UploadsModule } from './uploads/uploads.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -38,13 +41,29 @@ import { EmailModule } from './email/email.module';
       }),
     }),
 
+    // Serve static files (for avatars)
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
+
     // Application modules
+    UploadsModule,
     AuthModule,
     UsersModule,
     FhirModule.forRoot({
-      enableHapiFhir: process.env.ENABLE_HAPI_FHIR === 'true',
-      hapiFhirUrl: process.env.HAPI_FHIR_URL || 'http://localhost:9090/fhir',
-      localResources: (process.env.LOCAL_FHIR_RESOURCES || 'Patient,Practitioner,Organization').split(','),
+      // HAPI FHIR server URL
+      serverUrl: process.env.HAPI_FHIR_URL || 'http://localhost:9090/fhir',
+      // Authentication for HAPI FHIR server (none in this case)
+      auth: {
+        type: 'none'
+      },
+      // In the new architecture, all resources are stored in HAPI FHIR
+      // We only use MongoDB for user authentication and app-specific data
+      localResources: [],
+      // Enable validation and auditing
+      enableValidation: true,
+      enableAuditing: true,
     }),
     HealthModule,
     EmailModule,

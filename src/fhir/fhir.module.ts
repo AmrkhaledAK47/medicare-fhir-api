@@ -1,8 +1,9 @@
-import { Module, DynamicModule, Global, OnModuleInit } from '@nestjs/common';
+import { Module, DynamicModule, Global, OnModuleInit, MiddlewareConsumer, RequestMethod, Provider } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
 
 // Import schemas
 import { Patient, PatientSchema } from './schemas/patient.schema';
@@ -16,6 +17,18 @@ import { Questionnaire, QuestionnaireSchema } from './schemas/questionnaire.sche
 import { Payment, PaymentSchema } from './schemas/payment.schema';
 import { GenericResource, GenericResourceSchema } from './schemas/generic-resource.schema';
 import { FhirResource, FhirResourceSchema } from './schemas/fhir-resource.schema';
+import { AuditLog, AuditLogSchema } from './schemas/audit-log.schema';
+
+// Import adapters
+import { HapiFhirAdapter } from './adapters/hapi-fhir.adapter';
+import { TerminologyAdapter } from './adapters/terminology.adapter';
+
+// Import interceptors
+import { FhirValidationInterceptor } from './interceptors/fhir-validation.interceptor';
+import { AuditTrailInterceptor } from './interceptors/audit-trail.interceptor';
+
+// Import filters
+import { FhirExceptionFilter } from './filters/fhir-exception.filter';
 
 // Import services
 import { FhirService } from './fhir.service';
@@ -40,9 +53,21 @@ import { OrganizationController } from './controllers/organization.controller';
 import { EncounterController } from './controllers/encounter.controller';
 import { ObservationController } from './controllers/observation.controller';
 import { DiagnosticReportController } from './controllers/diagnostic-report.controller';
-import { MedicationController } from './controllers/medication.controller';
+import { MedicationController, MedicationRequestController } from './controllers/medication.controller';
 import { QuestionnaireController } from './controllers/questionnaire.controller';
 import { PaymentController } from './controllers/payment.controller';
+import { ConditionController } from './controllers/condition.controller';
+import { ProcedureController } from './controllers/procedure.controller';
+import { TerminologyController } from './controllers/terminology.controller';
+import { ValidationController } from './controllers/validation.controller';
+import { DocumentationController } from './controllers/documentation.controller';
+import { ExamplePaginationController } from './controllers/example-pagination.controller';
+
+// Import middleware
+import { FhirAuthorizationMiddleware } from './middleware/fhir-authorization.middleware';
+import { FhirVersioningMiddleware } from './middleware/fhir-versioning.middleware';
+import { FhirConfigService } from './config/fhir-config.service';
+import { FhirConfig } from './config/fhir-config.interface';
 
 @Global()
 @Module({})
@@ -54,25 +79,30 @@ export class FhirModule implements OnModuleInit {
         await this.resourceRegistry.initializeRegistry();
     }
 
-    static forRoot(options: {
-        enableHapiFhir?: boolean,
-        hapiFhirUrl?: string,
-        localResources?: string[]
-    } = {}): DynamicModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(FhirVersioningMiddleware, FhirAuthorizationMiddleware)
+            .forRoutes({ path: 'fhir/*', method: RequestMethod.ALL });
+    }
+
+    static forRoot(options: FhirConfig): DynamicModule {
+        const schemaImports = [
+            { name: FhirResource.name, schema: FhirResourceSchema },
+            { name: Patient.name, schema: PatientSchema },
+            { name: Practitioner.name, schema: PractitionerSchema },
+            { name: Organization.name, schema: OrganizationSchema },
+            { name: Encounter.name, schema: EncounterSchema },
+            { name: Observation.name, schema: ObservationSchema },
+            { name: DiagnosticReport.name, schema: DiagnosticReportSchema },
+            { name: Medication.name, schema: MedicationSchema },
+            { name: Questionnaire.name, schema: QuestionnaireSchema },
+            { name: Payment.name, schema: PaymentSchema },
+            { name: GenericResource.name, schema: GenericResourceSchema },
+            { name: AuditLog.name, schema: AuditLogSchema },
+        ];
+
         const imports = [
-            MongooseModule.forFeature([
-                { name: FhirResource.name, schema: FhirResourceSchema },
-                { name: Patient.name, schema: PatientSchema },
-                { name: Practitioner.name, schema: PractitionerSchema },
-                { name: Organization.name, schema: OrganizationSchema },
-                { name: Encounter.name, schema: EncounterSchema },
-                { name: Observation.name, schema: ObservationSchema },
-                { name: DiagnosticReport.name, schema: DiagnosticReportSchema },
-                { name: Medication.name, schema: MedicationSchema },
-                { name: Questionnaire.name, schema: QuestionnaireSchema },
-                { name: Payment.name, schema: PaymentSchema },
-                { name: GenericResource.name, schema: GenericResourceSchema },
-            ]),
+            MongooseModule.forFeature(schemaImports),
             ConfigModule,
             HttpModule.register({
                 timeout: 5000,
@@ -90,15 +120,16 @@ export class FhirModule implements OnModuleInit {
             }),
         ];
 
-        const providers = [
+        // Setup providers
+        const providers: Provider[] = [
             {
-                provide: 'FHIR_MODULE_OPTIONS',
-                useValue: {
-                    enableHapiFhir: options.enableHapiFhir || false,
-                    hapiFhirUrl: options.hapiFhirUrl || 'http://localhost:9090/fhir',
-                    localResources: options.localResources || [],
-                },
+                provide: 'FHIR_OPTIONS',
+                useValue: options || {},
             },
+            ConfigService,
+            FhirConfigService,
+            HapiFhirAdapter,
+            TerminologyAdapter,
             ResourceRegistryService,
             FhirService,
             GenericResourceService,
@@ -111,7 +142,31 @@ export class FhirModule implements OnModuleInit {
             MedicationService,
             QuestionnaireService,
             PaymentService,
+            FhirAuthorizationMiddleware,
+            FhirVersioningMiddleware,
+            // Global exception filter
+            {
+                provide: APP_FILTER,
+                useClass: FhirExceptionFilter,
+            },
         ];
+
+        // Setup interceptors
+        if (options.enableValidation !== false) {
+            providers.push(FhirValidationInterceptor);
+            providers.push({
+                provide: APP_INTERCEPTOR,
+                useClass: FhirValidationInterceptor,
+            });
+        }
+
+        if (options.enableAuditing !== false) {
+            providers.push(AuditTrailInterceptor);
+            providers.push({
+                provide: APP_INTERCEPTOR,
+                useClass: AuditTrailInterceptor,
+            });
+        }
 
         const controllers = [
             FhirController,
@@ -123,11 +178,20 @@ export class FhirModule implements OnModuleInit {
             ObservationController,
             DiagnosticReportController,
             MedicationController,
+            MedicationRequestController,
             QuestionnaireController,
             PaymentController,
+            ConditionController,
+            ProcedureController,
+            TerminologyController,
+            ValidationController,
+            DocumentationController,
+            ExamplePaginationController,
         ];
 
         const exports = [
+            HapiFhirAdapter,
+            TerminologyAdapter,
             ResourceRegistryService,
             FhirService,
             GenericResourceService,
@@ -141,6 +205,16 @@ export class FhirModule implements OnModuleInit {
             QuestionnaireService,
             PaymentService,
         ];
+
+        if (options.enableValidation !== false) {
+            // Don't add to exports, interceptors are only providers
+            // exports.push(FhirValidationInterceptor);
+        }
+
+        if (options.enableAuditing !== false) {
+            // Don't add to exports, interceptors are only providers
+            // exports.push(AuditTrailInterceptor);
+        }
 
         return {
             module: FhirModule,

@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "fhir:start": "docker-compose up -d",
     "fhir:stop": "docker-compose down",
-    "fhir:logs": "docker-compose logs -f"
+    "fhir:logs": "docker-compose logs -f",
+    "fhir:integration-test": "./run-integration-tests.sh"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
@@ -31,6 +32,7 @@
     "@nestjs/mongoose": "^10.0.2",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^10.3.2",
+    "@nestjs/serve-static": "^5.0.3",
     "@nestjs/swagger": "^7.3.1",
     "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
@@ -38,6 +40,7 @@
     "class-validator": "^0.14.1",
     "colors": "^1.4.0",
     "dotenv": "^16.4.7",
+    "express": "^5.1.0",
     "helmet": "^7.1.0",
     "joi": "^17.13.3",
     "mongoose": "^8.2.1",
@@ -47,7 +50,8 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.2",
@@ -60,6 +64,7 @@
     "@types/nodemailer": "^6.4.17",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.2",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
     "eslint": "^8.57.0",

@@ -8,6 +8,7 @@ export enum Role {
     ADMIN = 'admin',
     PRACTITIONER = 'practitioner',
     PATIENT = 'patient',
+    PHARMACIST = 'pharmacist',
 }
 
 // Metadata keys

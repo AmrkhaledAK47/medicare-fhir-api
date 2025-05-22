@@ -40,13 +40,13 @@ export class RegisterDto {
     repeatPassword: string;
 
     @ApiProperty({
-        description: 'Access code for registration (required for patient and practitioner accounts)',
+        description: 'Access code for registration (required for all accounts except first admin)',
         example: 'ABC123XYZ',
-        required: false
+        required: true
     })
     @IsString()
-    @IsOptional()
-    accessCode?: string;
+    @IsNotEmpty({ message: 'Access code is required' })
+    accessCode: string;
 
     @ApiProperty({
         description: 'Phone number',

@@ -1,7 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
-yarn.lock
 
 # Build output
 dist/
@@ -20,6 +18,7 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+api.log
 
 # IDE and editor files
 .idea/
@@ -33,7 +32,3 @@ Thumbs.db
 
 # Test coverage
 coverage/ 
-
-
-package.json
-package-lock.json

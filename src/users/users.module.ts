@@ -6,6 +6,7 @@ import { User, UserSchema } from './schemas/user.schema';
 import { EmailModule } from '../email/email.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { FhirModule } from '../fhir/fhir.module';
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             { name: User.name, schema: UserSchema }
         ]),
         EmailModule,
+        FhirModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],

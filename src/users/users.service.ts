@@ -5,6 +5,8 @@ import { User, UserRole, UserStatus, UserDocument } from './schemas/user.schema'
 import { CreateUserDto } from './dto/create-user.dto';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { EmailService } from '../email/email.service';
+import { FhirService } from '../fhir/fhir.service';
+import { CreateUserWithResourceDto } from './dto/create-user-with-resource.dto';
 import * as crypto from 'crypto';
 import { Role } from '../auth/guards/roles.guard';
 
@@ -12,7 +14,8 @@ import { Role } from '../auth/guards/roles.guard';
 export class UsersService {
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
-        private readonly emailService: EmailService
+        private readonly emailService: EmailService,
+        private readonly fhirService: FhirService
     ) { }
 
     async create(registerDto: RegisterDto): Promise<UserDocument> {
@@ -166,5 +169,136 @@ export class UsersService {
 
         // Send email with new access code
         await this.emailService.sendRegistrationCode(email, user.name, accessCode);
+    }
+
+    // Count the total number of users in the system
+    async countUsers(): Promise<number> {
+        return this.userModel.countDocuments().exec();
+    }
+
+    // Create a user with a FHIR resource in one operation
+    async createUserWithResource(createUserWithResourceDto: CreateUserWithResourceDto): Promise<{ user: User, resourceId: string, accessCode: string }> {
+        const { name, email, role, phone, resourceData } = createUserWithResourceDto;
+
+        // Check if user already exists
+        const existingUser = await this.userModel.findOne({ email });
+        if (existingUser) {
+            throw new ConflictException('User with this email already exists');
+        }
+
+        // Determine the resource type based on the role
+        const resourceType = role === UserRole.PATIENT ? 'Patient' : 'Practitioner';
+
+        // Ensure the resourceData has the correct resourceType
+        const resourceToCreate = {
+            ...resourceData,
+            resourceType: resourceType
+        };
+
+        try {
+            // Create the FHIR resource
+            const createdResource = await this.fhirService.createResource(resourceType, resourceToCreate);
+            const resourceId = createdResource.id;
+
+            // Generate a random access code
+            const accessCode = crypto.randomBytes(4).toString('hex').toUpperCase();
+            const accessCodeExpires = new Date();
+            accessCodeExpires.setDate(accessCodeExpires.getDate() + 7); // Code expires in 7 days
+
+            // Create a new user with pending status
+            const newUser = new this.userModel({
+                name,
+                email,
+                role,
+                phone,
+                status: UserStatus.PENDING,
+                accessCode,
+                accessCodeExpires,
+                fhirResourceId: resourceId,
+                fhirResourceType: resourceType,
+                // Generate a temporary password that will be replaced during registration
+                password: crypto.randomBytes(16).toString('hex')
+            });
+
+            await newUser.save();
+
+            // Send email with access code
+            await this.emailService.sendRegistrationCode(email, name, accessCode);
+
+            return {
+                user: newUser,
+                resourceId,
+                accessCode
+            };
+        } catch (error) {
+            throw new BadRequestException(`Failed to create user with resource: ${error.message}`);
+        }
+    }
+
+    async updateAvatar(userId: string, file: any): Promise<{ message: string; avatarUrl: string }> {
+        const user = await this.findById(userId);
+
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        if (!file) {
+            throw new BadRequestException('No file uploaded');
+        }
+
+        // The file path based on our static file serving configuration
+        const avatarUrl = `/uploads/${file.filename}`;
+
+        // Update the user's profile image URL
+        await this.userModel.findByIdAndUpdate(userId, {
+            profileImageUrl: avatarUrl
+        });
+
+        return {
+            message: 'Avatar updated successfully',
+            avatarUrl
+        };
+    }
+
+    async getUserProfile(userId: string): Promise<any> {
+        const user = await this.userModel.findById(userId).exec();
+
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        const profile = {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            status: user.status,
+            phone: user.phone,
+            profileImageUrl: user.profileImageUrl,
+            isEmailVerified: user.isEmailVerified,
+            fhirDetails: null
+        };
+
+        // If the user has a FHIR resource, fetch it
+        if (user.fhirResourceId && user.fhirResourceType) {
+            try {
+                const fhirResource = await this.fhirService.getResource(
+                    user.fhirResourceType,
+                    user.fhirResourceId
+                );
+
+                profile.fhirDetails = {
+                    resourceType: user.fhirResourceType,
+                    id: user.fhirResourceId,
+                    details: fhirResource
+                };
+            } catch (error) {
+                // Log error but don't fail the request
+                console.error(`Failed to fetch FHIR resource for user ${userId}:`, error);
+                profile.fhirDetails = { error: 'Failed to fetch FHIR resource' };
+            }
+        }
+
+        return profile;
     }
 } 

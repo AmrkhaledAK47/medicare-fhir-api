@@ -1,77 +1,215 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, UseGuards, Req, Query, Param, Body, Put } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import { BaseResourceController } from '../controllers/base-resource.controller';
+import { HapiFhirAdapter } from '../adapters/hapi-fhir.adapter';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { RolesGuard, Role, Action } from '../../auth/guards/roles.guard';
-import { Roles, ResourcePermission } from '../../auth/decorators/roles.decorator';
-import { EncounterService } from '../services/encounter.service';
+import { RolesGuard, Role } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { Request } from 'express';
 
 @ApiTags('encounters')
-@Controller('encounters')
+@Controller('fhir/Encounter')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
-export class EncounterController {
-    constructor(private readonly encounterService: EncounterService) { }
+export class EncounterController extends BaseResourceController {
+    constructor(protected readonly hapiFhirAdapter: HapiFhirAdapter) {
+        super(hapiFhirAdapter, 'Encounter');
+    }
 
-    @Get()
-    @ApiOperation({ summary: 'Get all encounters with pagination' })
-    @ApiQuery({ name: 'page', required: false, description: 'Page number' })
-    @ApiQuery({ name: 'limit', required: false, description: 'Items per page' })
-    @ApiQuery({ name: 'patientId', required: false, description: 'Filter by patient ID' })
-    @ApiResponse({ status: 200, description: 'List of encounters' })
-    async findAll(
-        @Query('page') page = 1,
-        @Query('limit') limit = 10,
-        @Query('patientId') patientId?: string,
-    ) {
-        // If patientId is provided, filter by patient
-        if (patientId) {
-            return this.encounterService.findByPatientId(patientId);
+    /**
+     * Get all encounters for the authenticated practitioner
+     */
+    @Get('$my-encounters')
+    @ApiOperation({ summary: 'Get all encounters for the authenticated practitioner' })
+    @ApiResponse({ status: 200, description: 'Encounters retrieved successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - User is not a practitioner' })
+    @Roles(Role.PRACTITIONER, Role.ADMIN)
+    async getMyEncounters(
+        @Req() req: Request & { user: any },
+        @Query() query: Record<string, any>,
+    ): Promise<any> {
+        if (!req.user.fhirResourceId) {
+            throw new Error('No practitioner record associated with this account');
         }
 
-        // Otherwise use standard pagination
-        return this.encounterService.findAll({
-            page: +page,
-            limit: +limit,
-        });
+        const params = {
+            ...query,
+            'participant': `Practitioner/${req.user.fhirResourceId}`,
+        };
+
+        return this.hapiFhirAdapter.search('Encounter', params);
     }
 
-    @Get(':id')
-    @ApiOperation({ summary: 'Get encounter by ID' })
+    /**
+     * Get all encounters for a specific patient
+     */
+    @Get('patient/:patientId')
+    @ApiOperation({ summary: 'Get all encounters for a specific patient' })
+    @ApiParam({ name: 'patientId', description: 'Patient ID' })
+    @ApiResponse({ status: 200, description: 'Encounters retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'Patient not found' })
+    @Roles(Role.PRACTITIONER, Role.ADMIN)
+    async getPatientEncounters(
+        @Param('patientId') patientId: string,
+        @Query() query: Record<string, any>,
+    ): Promise<any> {
+        // Verify the patient exists
+        await this.hapiFhirAdapter.getById('Patient', patientId);
+
+        const params = {
+            ...query,
+            'subject': `Patient/${patientId}`,
+        };
+
+        return this.hapiFhirAdapter.search('Encounter', params);
+    }
+
+    /**
+     * Get current/active encounters
+     */
+    @Get('$active')
+    @ApiOperation({ summary: 'Get all active encounters' })
+    @ApiResponse({ status: 200, description: 'Active encounters retrieved successfully' })
+    @Roles(Role.PRACTITIONER, Role.ADMIN)
+    async getActiveEncounters(@Query() query: Record<string, any>): Promise<any> {
+        const params = {
+            ...query,
+            'status': 'in-progress,planned,arrived,triaged',
+        };
+
+        return this.hapiFhirAdapter.search('Encounter', params);
+    }
+
+    /**
+     * Get all resources associated with an encounter
+     */
+    @Get(':id/$everything')
+    @ApiOperation({ summary: 'Get all resources associated with an encounter' })
     @ApiParam({ name: 'id', description: 'Encounter ID' })
-    @ApiResponse({ status: 200, description: 'The encounter' })
+    @ApiResponse({ status: 200, description: 'Associated resources retrieved successfully' })
     @ApiResponse({ status: 404, description: 'Encounter not found' })
-    async findOne(@Param('id') id: string) {
-        return this.encounterService.findById(id);
+    @Roles(Role.PRACTITIONER, Role.ADMIN)
+    async getEncounterEverything(
+        @Param('id') id: string,
+        @Query() query: Record<string, any>,
+    ): Promise<any> {
+        // First make sure the encounter exists
+        const encounter = await this.hapiFhirAdapter.getById('Encounter', id);
+
+        // Get patient ID from the encounter
+        const patientId = encounter.subject?.reference?.split('/')[1];
+        if (!patientId) {
+            throw new Error('Encounter does not have a valid patient reference');
+        }
+
+        // Get all resources associated with this encounter
+        const encounterData = {
+            encounter: encounter,
+            observations: await this.hapiFhirAdapter.search('Observation', { 'encounter': `Encounter/${id}` }),
+            conditions: await this.hapiFhirAdapter.search('Condition', { 'encounter': `Encounter/${id}` }),
+            medicationRequests: await this.hapiFhirAdapter.search('MedicationRequest', { 'encounter': `Encounter/${id}` }),
+            procedures: await this.hapiFhirAdapter.search('Procedure', { 'encounter': `Encounter/${id}` }),
+            documentReferences: await this.hapiFhirAdapter.search('DocumentReference', { 'encounter': `Encounter/${id}` }),
+            diagnosticReports: await this.hapiFhirAdapter.search('DiagnosticReport', { 'encounter': `Encounter/${id}` }),
+        };
+
+        return encounterData;
     }
 
+    /**
+     * Create a new encounter
+     */
     @Post()
-    @Roles(Role.ADMIN, Role.PRACTITIONER)
-    @ApiOperation({ summary: 'Create new encounter' })
+    @ApiOperation({ summary: 'Create a new encounter' })
+    @ApiBody({ description: 'Encounter resource' })
     @ApiResponse({ status: 201, description: 'Encounter created successfully' })
-    @ApiResponse({ status: 403, description: 'Forbidden' })
-    async create(@Body() data: any) {
-        return this.encounterService.create(data);
+    @ApiResponse({ status: 400, description: 'Invalid encounter data' })
+    @Roles(Role.PRACTITIONER, Role.ADMIN)
+    async createEncounter(@Body() data: any): Promise<any> {
+        // Ensure we have a valid Encounter resource
+        if (!data.resourceType || data.resourceType !== 'Encounter') {
+            throw new Error('Invalid encounter data. Expected Encounter resource.');
+        }
+
+        return this.hapiFhirAdapter.create('Encounter', data);
     }
 
-    @Put(':id')
-    @Roles(Role.ADMIN, Role.PRACTITIONER)
-    @ApiOperation({ summary: 'Update encounter by ID' })
+    /**
+     * Update encounter status
+     */
+    @Put(':id/status')
+    @ApiOperation({ summary: 'Update encounter status' })
     @ApiParam({ name: 'id', description: 'Encounter ID' })
-    @ApiResponse({ status: 200, description: 'Encounter updated successfully' })
-    @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiBody({ description: 'Status update data' })
+    @ApiResponse({ status: 200, description: 'Encounter status updated successfully' })
     @ApiResponse({ status: 404, description: 'Encounter not found' })
-    async update(@Param('id') id: string, @Body() data: any) {
-        return this.encounterService.update(id, data);
+    @Roles(Role.PRACTITIONER, Role.ADMIN)
+    async updateStatus(
+        @Param('id') id: string,
+        @Body() data: { status: string },
+    ): Promise<any> {
+        // Get the current encounter
+        const encounter = await this.hapiFhirAdapter.getById('Encounter', id);
+
+        // Validate the status
+        const validStatuses = ['planned', 'arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'cancelled'];
+        if (!validStatuses.includes(data.status)) {
+            throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+        }
+
+        // Update the status
+        encounter.status = data.status;
+
+        // If the status is 'finished', set the end date
+        if (data.status === 'finished' && !encounter.period?.end) {
+            if (!encounter.period) {
+                encounter.period = {};
+            }
+            encounter.period.end = new Date().toISOString();
+        }
+
+        // Update the encounter
+        return this.hapiFhirAdapter.update('Encounter', id, encounter);
     }
 
-    @Delete(':id')
-    @Roles(Role.ADMIN)
-    @ApiOperation({ summary: 'Delete encounter by ID' })
-    @ApiParam({ name: 'id', description: 'Encounter ID' })
-    @ApiResponse({ status: 200, description: 'Encounter deleted successfully' })
-    @ApiResponse({ status: 403, description: 'Forbidden - requires admin privileges' })
-    @ApiResponse({ status: 404, description: 'Encounter not found' })
-    async remove(@Param('id') id: string) {
-        return this.encounterService.remove(id);
+    /**
+     * Override transformQueryParams to add encounter-specific search parameter handling
+     */
+    protected transformQueryParams(params: any): Record<string, string> {
+        const searchParams = super.transformQueryParams(params);
+
+        // Handle date range searches for Encounter.period
+        if (params.date) {
+            searchParams.date = params.date;
+        } else {
+            if (params.date_start) {
+                searchParams['date'] = `ge${params.date_start}`;
+            }
+            if (params.date_end) {
+                if (searchParams['date']) {
+                    searchParams['date'] += `,le${params.date_end}`;
+                } else {
+                    searchParams['date'] = `le${params.date_end}`;
+                }
+            }
+        }
+
+        // Handle status filter - can be comma-separated list
+        if (params.status && Array.isArray(params.status)) {
+            searchParams.status = params.status.join(',');
+        }
+
+        // Handle specialty filtering
+        if (params.specialty) {
+            searchParams['service-type'] = params.specialty;
+            delete searchParams.specialty;
+        }
+
+        // Handle location filtering
+        if (params.location) {
+            searchParams['location'] = params.location;
+        }
+
+        return searchParams;
     }
 } 
