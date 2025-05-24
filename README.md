@@ -14,6 +14,7 @@
 [![FHIR v4.0.1](https://img.shields.io/badge/FHIR-v4.0.1-green.svg)](https://www.hl7.org/fhir/)
 [![NestJS](https://img.shields.io/badge/NestJS-v10.0.0-red.svg)](https://nestjs.com)
 [![MongoDB](https://img.shields.io/badge/MongoDB-v4.4+-darkgreen.svg)](https://www.mongodb.com/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AmrkhaledAK47/medicare-fhir-api)
 
 ## Table of Contents
 
