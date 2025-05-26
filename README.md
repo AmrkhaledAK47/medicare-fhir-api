@@ -294,7 +294,7 @@ The application follows a clean architecture pattern with distinct layers:
 [HAPI FHIR](https://hapifhir.io) is the leading open-source implementation of the FHIR standard for healthcare interoperability. It provides a complete solution for working with FHIR resources and implementing FHIR servers and clients.
 
 <div align="center">
-  <img src="https://hapifhir.io/hapi-fhir/images/hapi-fhir-banner-dark.png" alt="HAPI FHIR" width="600"/>
+  <img src="https://hapifhir.io/images/logos/raccoon-sashay.png" alt="HAPI FHIR" width="300"/>
 </div>
 
 Key features of HAPI FHIR include:
