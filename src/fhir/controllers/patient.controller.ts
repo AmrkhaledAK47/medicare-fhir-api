@@ -1,11 +1,12 @@
 import { Controller, Get, UseGuards, Req, Query, Param, Post, Body, Put, Patch } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody, ApiQuery, getSchemaPath } from '@nestjs/swagger';
 import { BaseResourceController } from '../controllers/base-resource.controller';
 import { HapiFhirAdapter } from '../adapters/hapi-fhir.adapter';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard, Role } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { Request } from 'express';
+import { FhirBundleDto, OperationOutcomeDto, PatientDto, ObservationDto } from '../dto/fhir-response.dto';
 
 @ApiTags('patients')
 @Controller('fhir/Patient')
@@ -20,8 +21,15 @@ export class PatientController extends BaseResourceController {
      * Get the patient resource associated with the authenticated user
      */
     @Get('$my-profile')
-    @ApiOperation({ summary: 'Get the patient profile for the authenticated user' })
-    @ApiResponse({ status: 200, description: 'Patient record retrieved successfully' })
+    @ApiOperation({
+        summary: 'Get the patient profile for the authenticated user',
+        description: 'Retrieves the FHIR Patient resource that is associated with the currently authenticated user. The user must have the PATIENT role.'
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Patient record retrieved successfully',
+        type: PatientDto
+    })
     @ApiResponse({ status: 403, description: 'Forbidden - User is not a patient' })
     @ApiResponse({ status: 404, description: 'Patient profile not found' })
     @Roles(Role.PATIENT)
@@ -37,8 +45,15 @@ export class PatientController extends BaseResourceController {
      * Get all encounters for the authenticated patient
      */
     @Get('$my-encounters')
-    @ApiOperation({ summary: 'Get encounters for the authenticated patient' })
-    @ApiResponse({ status: 200, description: 'Encounters retrieved successfully' })
+    @ApiOperation({
+        summary: 'Get encounters for the authenticated patient',
+        description: 'Retrieves all clinical encounters for the currently authenticated patient. Results can be filtered and paginated using query parameters.'
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Encounters retrieved successfully',
+        type: FhirBundleDto
+    })
     @ApiResponse({ status: 403, description: 'Forbidden - User is not a patient' })
     @Roles(Role.PATIENT)
     async getMyEncounters(
@@ -61,8 +76,15 @@ export class PatientController extends BaseResourceController {
      * Get all observations for the authenticated patient
      */
     @Get('$my-observations')
-    @ApiOperation({ summary: 'Get observations for the authenticated patient' })
-    @ApiResponse({ status: 200, description: 'Observations retrieved successfully' })
+    @ApiOperation({
+        summary: 'Get observations for the authenticated patient',
+        description: 'Retrieves all clinical observations (vital signs, lab results, etc.) for the currently authenticated patient. Results can be filtered and paginated using query parameters.'
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Observations retrieved successfully',
+        type: FhirBundleDto
+    })
     @ApiResponse({ status: 403, description: 'Forbidden - User is not a patient' })
     @Roles(Role.PATIENT)
     async getMyObservations(
@@ -138,10 +160,122 @@ export class PatientController extends BaseResourceController {
      * Register a new patient with the system
      */
     @Post('$register')
-    @ApiOperation({ summary: 'Register a new patient' })
-    @ApiBody({ description: 'Patient registration data' })
-    @ApiResponse({ status: 201, description: 'Patient registered successfully' })
-    @ApiResponse({ status: 400, description: 'Invalid registration data' })
+    @ApiOperation({
+        summary: 'Register a new patient',
+        description: 'Creates a new patient resource in the FHIR server. Typically used during the registration process.'
+    })
+    @ApiBody({
+        description: 'Patient registration data',
+        schema: {
+            type: 'object',
+            required: ['resource'],
+            properties: {
+                resource: {
+                    type: 'object',
+                    required: ['resourceType'],
+                    properties: {
+                        resourceType: { type: 'string', enum: ['Patient'] },
+                        active: { type: 'boolean' },
+                        name: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    use: { type: 'string', enum: ['official', 'usual', 'nickname', 'anonymous', 'maiden', 'old'] },
+                                    family: { type: 'string' },
+                                    given: { type: 'array', items: { type: 'string' } },
+                                    prefix: { type: 'array', items: { type: 'string' } },
+                                    suffix: { type: 'array', items: { type: 'string' } }
+                                }
+                            }
+                        },
+                        telecom: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    system: { type: 'string', enum: ['phone', 'email', 'fax', 'pager', 'url', 'sms', 'other'] },
+                                    value: { type: 'string' },
+                                    use: { type: 'string', enum: ['home', 'work', 'temp', 'old', 'mobile'] }
+                                }
+                            }
+                        },
+                        gender: { type: 'string', enum: ['male', 'female', 'other', 'unknown'] },
+                        birthDate: { type: 'string', format: 'date' },
+                        address: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    use: { type: 'string', enum: ['home', 'work', 'temp', 'old', 'billing'] },
+                                    type: { type: 'string', enum: ['postal', 'physical', 'both'] },
+                                    line: { type: 'array', items: { type: 'string' } },
+                                    city: { type: 'string' },
+                                    district: { type: 'string' },
+                                    state: { type: 'string' },
+                                    postalCode: { type: 'string' },
+                                    country: { type: 'string' }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        examples: {
+            patientExample: {
+                value: {
+                    "resource": {
+                        "resourceType": "Patient",
+                        "active": true,
+                        "name": [
+                            {
+                                "use": "official",
+                                "family": "Smith",
+                                "given": ["John", "Edward"],
+                                "prefix": ["Mr"]
+                            }
+                        ],
+                        "telecom": [
+                            {
+                                "system": "phone",
+                                "value": "555-123-4567",
+                                "use": "home"
+                            },
+                            {
+                                "system": "email",
+                                "value": "john.smith@example.com",
+                                "use": "work"
+                            }
+                        ],
+                        "gender": "male",
+                        "birthDate": "1980-01-01",
+                        "address": [
+                            {
+                                "use": "home",
+                                "type": "both",
+                                "line": ["123 Main St", "Apt 4B"],
+                                "city": "Anytown",
+                                "state": "CA",
+                                "postalCode": "12345",
+                                "country": "USA"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    })
+    @ApiResponse({
+        status: 201,
+        description: 'Patient registered successfully',
+        type: PatientDto
+    })
+    @ApiResponse({
+        status: 400,
+        description: 'Invalid registration data',
+        type: OperationOutcomeDto
+    })
     async registerPatient(@Body() data: any): Promise<any> {
         // Ensure we have a valid Patient resource
         if (!data.resource || data.resource.resourceType !== 'Patient') {
@@ -397,5 +531,60 @@ export class PatientController extends BaseResourceController {
                 other: otherResult.total || 0,
             }
         };
+    }
+
+    // Override for search method to add examples
+    @Get()
+    @ApiOperation({
+        summary: 'Search for patients',
+        description: 'Search for patients using FHIR search parameters. Results are paginated and can be filtered by name, gender, birthdate, and other supported parameters.'
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Search results',
+        type: FhirBundleDto
+    })
+    @ApiResponse({
+        status: 401,
+        description: 'Unauthorized - Authentication required'
+    })
+    @ApiQuery({ name: 'name', required: false, description: 'Patient name (supports :exact and :contains modifiers)' })
+    @ApiQuery({ name: 'gender', required: false, description: 'Patient gender (male, female, other, unknown)' })
+    @ApiQuery({ name: 'birthdate', required: false, description: 'Birth date in YYYY-MM-DD format (supports gt, lt, ge, le prefixes)' })
+    @ApiQuery({ name: 'identifier', required: false, description: 'Patient identifier (format: [system]|[value])' })
+    @ApiQuery({ name: '_count', required: false, description: 'Number of results per page' })
+    @ApiQuery({ name: '_getpagesoffset', required: false, description: 'Offset for pagination' })
+    async search(
+        @Query() params: any,
+        @Req() req: Request & { user: any },
+    ): Promise<any> {
+        return super.search(params, req);
+    }
+
+    // Override for findOne method to add examples
+    @Get(':id')
+    @ApiOperation({
+        summary: 'Get a patient by ID',
+        description: 'Retrieves a specific patient resource by its ID. The user must have appropriate permissions to access the patient data.'
+    })
+    @ApiParam({ name: 'id', description: 'Patient ID' })
+    @ApiResponse({
+        status: 200,
+        description: 'Patient retrieved successfully',
+        type: PatientDto
+    })
+    @ApiResponse({
+        status: 404,
+        description: 'Not Found - Resource does not exist'
+    })
+    @ApiResponse({
+        status: 401,
+        description: 'Unauthorized - Authentication required'
+    })
+    async findOne(
+        @Param('id') id: string,
+        @Req() req: Request & { user: any },
+    ): Promise<any> {
+        return super.findOne(id, req);
     }
 } 

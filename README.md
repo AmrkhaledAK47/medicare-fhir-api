@@ -34,6 +34,7 @@
   - [Integration Benefits](#integration-benefits)
   - [HAPI FHIR Server Setup](#hapi-fhir-server-setup)
 - [API Documentation](#api-documentation)
+  - [Swagger Documentation](#swagger-documentation)
   - [Authentication](#authentication)
   - [Role-Based Access](#role-based-access)
   - [Core Endpoints](#core-endpoints)
@@ -354,6 +355,74 @@ npm run start:dev
 Once configured, the API will automatically route appropriate FHIR operations to the HAPI FHIR server while still enforcing its own authentication and authorization rules. This provides the best of both worlds: the security and custom functionality of the MediCare API alongside the comprehensive FHIR capabilities of HAPI FHIR.
 
 ## API Documentation
+
+### Swagger Documentation
+
+The MediCare FHIR API includes comprehensive API documentation using Swagger/OpenAPI. This documentation provides detailed information about all endpoints, request/response formats, and authentication requirements.
+
+#### Viewing Documentation
+
+When running the application, Swagger documentation is available at:
+```
+http://localhost:3000/api/docs
+```
+
+This interactive documentation allows you to:
+- Browse all API endpoints organized by category
+- View detailed request and response schemas
+- Test API calls directly from the browser
+- Authenticate using JWT tokens
+- View examples and descriptions
+
+#### Generating Static Documentation
+
+For sharing with frontend teams or deploying to a static hosting service, you can generate static Swagger documentation:
+
+```bash
+# Install required dependencies
+npm install
+
+# Generate static Swagger documentation
+npm run swagger:generate
+```
+
+This creates a `swagger-static` directory containing:
+- `swagger.json`: The complete OpenAPI specification
+- `index.html`: Interactive Swagger UI for viewing the documentation
+- `README.md`: Usage instructions for the frontend team
+
+#### Serving Documentation Locally
+
+To view the generated documentation locally:
+
+```bash
+npm run swagger:serve
+```
+
+This starts a local HTTP server at `http://localhost:8000` with the Swagger documentation.
+
+#### Deploying Documentation
+
+The generated documentation can be deployed to various platforms:
+
+```bash
+# Show available deployment options
+npm run swagger:deploy
+
+# Deploy to a specific platform (e.g., Netlify)
+npm run swagger:deploy netlify
+```
+
+Supported platforms include:
+- Local server
+- Netlify
+- GitHub Pages
+- Surge.sh
+- AWS S3
+- Firebase Hosting
+- Vercel
+
+For more details about the Swagger documentation, please see the [Swagger Documentation Guide](docs/SWAGGER-DOCUMENTATION.md).
 
 ### Authentication
 
