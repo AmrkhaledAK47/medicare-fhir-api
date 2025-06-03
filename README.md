@@ -1,5 +1,17 @@
 # MediCare FHIR API
 
+[![Deploy to DigitalOcean](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/YOUR_GITHUB_USERNAME/fhir-ehr-platform/tree/main)
+
+## Quick Deployment
+
+For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+To deploy this application to DigitalOcean App Platform:
+
+1. Click the "Deploy to DigitalOcean" button above
+2. Follow the setup wizard to configure your application
+3. Deploy and access your application
+
 <div align="center">
   <img src="https://www.hl7.org/fhir/assets/images/fhir-logo-www.png" alt="FHIR Logo" width="300"/>
   <p><strong>A comprehensive FHIR-based Electronic Health Records (EHR) API with role-based access control and ML integration capabilities</strong></p>
