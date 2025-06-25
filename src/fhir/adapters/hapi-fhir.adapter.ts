@@ -15,7 +15,7 @@ export class HapiFhirAdapter {
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
     ) {
-        this.baseUrl = this.configService.get<string>('fhir.hapiFhirUrl') || 'http://localhost:9090/fhir';
+        this.baseUrl = this.configService.get<string>('fhir.hapiFhirUrl') || 'http://hapi-fhir:8080/fhir';
         this.maxRetries = this.configService.get<number>('fhir.maxRetries') || 3;
         this.retryDelay = this.configService.get<number>('fhir.retryDelay') || 1000;
         this.logger.log(`HAPI FHIR Adapter initialized with server URL: ${this.baseUrl}`);

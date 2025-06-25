@@ -1,0 +1,330 @@
+{
+    "info": {
+        "_postman_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+        "name": "MediCare Patient Flow",
+        "description": "A collection for testing the complete patient flow in the MediCare FHIR API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Admin Login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin123!\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/login",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "login"
+                    ]
+                },
+                "description": "Login as an admin to get the authentication token"
+            },
+            "response": [],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "",
+                            "if (jsonData && jsonData.accessToken) {",
+                            "    pm.environment.set(\"adminToken\", jsonData.accessToken);",
+                            "    console.log(\"Admin token saved to environment\");",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. Create Patient Resource",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{adminToken}}"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"name\": \"John Smith\",\n  \"email\": \"patient@example.com\",\n  \"role\": \"patient\",\n  \"phone\": \"+1234567890\",\n  \"resourceData\": {\n    \"name\": [\n      {\n        \"family\": \"Smith\",\n        \"given\": [\"John\"]\n      }\n    ],\n    \"gender\": \"male\",\n    \"birthDate\": \"1980-07-15\",\n    \"telecom\": [\n      {\n        \"system\": \"phone\",\n        \"value\": \"+1234567890\",\n        \"use\": \"mobile\"\n      },\n      {\n        \"system\": \"email\",\n        \"value\": \"patient@example.com\"\n      }\n    ],\n    \"address\": [\n      {\n        \"use\": \"home\",\n        \"line\": [\"123 Main St\"],\n        \"city\": \"Anytown\",\n        \"state\": \"CA\",\n        \"postalCode\": \"12345\",\n        \"country\": \"USA\"\n      }\n    ]\n  }\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/users/with-resource",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        "with-resource"
+                    ]
+                },
+                "description": "Create a patient resource and user profile with pending status"
+            },
+            "response": [],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "",
+                            "if (jsonData && jsonData.resourceId) {",
+                            "    pm.environment.set(\"patientResourceId\", jsonData.resourceId);",
+                            "    console.log(\"Patient resource ID saved to environment\");",
+                            "}",
+                            "",
+                            "// Note: In a real scenario, you would get the access code from the email",
+                            "// For testing, you can check the server logs and manually set it",
+                            "// pm.environment.set(\"accessCode\", \"ABC123XYZ\");"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3. Verify Access Code",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"patient@example.com\",\n  \"accessCode\": \"{{accessCode}}\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/verify-access-code",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "verify-access-code"
+                    ]
+                },
+                "description": "Verify the access code sent to the patient's email"
+            },
+            "response": []
+        },
+        {
+            "name": "4. Patient Registration",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"name\": \"John Smith\",\n  \"email\": \"patient@example.com\",\n  \"password\": \"Patient123!\",\n  \"repeatPassword\": \"Patient123!\",\n  \"accessCode\": \"{{accessCode}}\",\n  \"phone\": \"+1234567890\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/register",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "register"
+                    ]
+                },
+                "description": "Register the patient using the access code"
+            },
+            "response": [],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "",
+                            "if (jsonData && jsonData.accessToken) {",
+                            "    pm.environment.set(\"patientToken\", jsonData.accessToken);",
+                            "    console.log(\"Patient token saved to environment\");",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "5. Patient Login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"patient@example.com\",\n  \"password\": \"Patient123!\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/login",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "login"
+                    ]
+                },
+                "description": "Login as the patient to get a fresh token"
+            },
+            "response": [],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "",
+                            "if (jsonData && jsonData.accessToken) {",
+                            "    pm.environment.set(\"patientToken\", jsonData.accessToken);",
+                            "    console.log(\"Patient token saved to environment\");",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "6. Get Patient Profile",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{patientToken}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/profile",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        "profile"
+                    ]
+                },
+                "description": "Get the patient's profile information"
+            },
+            "response": []
+        },
+        {
+            "name": "7. Get Patient FHIR Resource",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{patientToken}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/fhir/Patient/{{patientResourceId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "fhir",
+                        "Patient",
+                        "{{patientResourceId}}"
+                    ]
+                },
+                "description": "Get the patient's FHIR resource"
+            },
+            "response": []
+        },
+        {
+            "name": "8. Regenerate Access Code (Admin Only)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{adminToken}}"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"patient@example.com\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/users/regenerate-access-code",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        "regenerate-access-code"
+                    ]
+                },
+                "description": "Regenerate the access code for a user (admin only)"
+            },
+            "response": []
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000/api",
+            "type": "string"
+        }
+    ]
+}

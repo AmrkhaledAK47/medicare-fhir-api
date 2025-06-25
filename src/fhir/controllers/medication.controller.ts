@@ -73,6 +73,40 @@ export class MedicationController extends BaseResourceController {
 
         return this.hapiFhirAdapter.create('Medication', data);
     }
+
+    /**
+     * Override transformQueryParams to add medication-specific search parameter handling
+     */
+    protected transformQueryParams(params: any): Record<string, string> {
+        const searchParams = super.transformQueryParams(params);
+
+        // Handle code filter - can handle standard medication codes
+        if (params.code) {
+            searchParams.code = params.code;
+        }
+
+        // Handle form filter (e.g., tablet, capsule, liquid)
+        if (params.form) {
+            searchParams.form = params.form;
+        }
+
+        // Handle ingredient filter
+        if (params.ingredient) {
+            searchParams.ingredient = params.ingredient;
+        }
+
+        // Handle status filter
+        if (params.status) {
+            searchParams.status = params.status;
+        }
+
+        // Handle manufacturer filter
+        if (params.manufacturer) {
+            searchParams.manufacturer = params.manufacturer;
+        }
+
+        return searchParams;
+    }
 }
 
 @ApiTags('medication-requests')

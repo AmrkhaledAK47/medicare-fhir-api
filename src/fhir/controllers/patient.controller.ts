@@ -325,6 +325,19 @@ export class PatientController extends BaseResourceController {
             delete searchParams.tag;
         }
 
+        // Ensure gender is correctly passed if present
+        if (params.gender) {
+            searchParams.gender = params.gender;
+        }
+
+        // Handle _count parameter explicitly
+        if (params._count) {
+            searchParams._count = params._count.toString();
+        }
+
+        // For debugging
+        console.log('Transformed search params:', searchParams);
+
         return searchParams;
     }
 
@@ -558,7 +571,16 @@ export class PatientController extends BaseResourceController {
         @Query() params: any,
         @Req() req: Request & { user: any },
     ): Promise<any> {
-        return super.search(params, req);
+        console.log('Patient search params:', params);
+        const transformedParams = this.transformQueryParams(params);
+        console.log('Transformed params:', transformedParams);
+
+        try {
+            return await this.hapiFhirAdapter.search(this.resourceType, transformedParams);
+        } catch (error) {
+            console.error('Error searching patients:', error);
+            throw error;
+        }
     }
 
     // Override for findOne method to add examples

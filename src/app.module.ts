@@ -53,7 +53,7 @@ import { join } from 'path';
     UsersModule,
     FhirModule.forRoot({
       // HAPI FHIR server URL
-      serverUrl: process.env.HAPI_FHIR_URL || 'http://localhost:9090/fhir',
+      serverUrl: process.env.HAPI_FHIR_URL || 'http://hapi-fhir:8080/fhir',
       // Authentication for HAPI FHIR server (none in this case)
       auth: {
         type: 'none'

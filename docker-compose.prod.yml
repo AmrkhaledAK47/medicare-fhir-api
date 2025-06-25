@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  # HAPI FHIR server
+  hapi-fhir:
+    image: hapiproject/hapi:latest
+    container_name: hapi-fhir-jpaserver
+    ports:
+      - "9090:8080"
+    environment:
+      - spring.config.import=optional:file:/app/config/application.yaml
+      - hapi.fhir.validation.enabled=true
+      - hapi.fhir.narrative.serverBaseUrl=${FHIR_SERVER_BASE_URL:-http://localhost:9090/fhir}
+      - "hapi.fhir.cors.allow_credentials=true"
+      - "hapi.fhir.cors.allowed_origin=${CORS_ALLOWED_ORIGINS:-*}"
+      - hapi.fhir.allow_multiple_delete=${ALLOW_MULTIPLE_DELETE:-false}
+      - hapi.fhir.allow_external_references=${ALLOW_EXTERNAL_REFERENCES:-false}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/hapi
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-admin}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-admin}
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect
+    volumes:
+      - ./application.yaml:/app/config/application.yaml:ro
+      - hapi-data:/data/hapi
+    restart: unless-stopped
+    networks:
+      - medicare-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/fhir/metadata" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # PostgreSQL database for HAPI FHIR server - production configuration
+  postgres:
+    image: postgres:14
+    container_name: hapi-postgres
+    environment:
+      POSTGRES_DB: hapi
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+      # Production PostgreSQL settings
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+      # Optimize PostgreSQL for FHIR workloads
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      # Mount custom PostgreSQL configuration if needed
+      # - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+    networks:
+      - medicare-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d hapi" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: [ "postgres", "-c", "shared_buffers=256MB", "-c", "max_connections=200", "-c", "work_mem=8MB" ]
+    # No ports exposed to the host in production for security
+    # Access only through the networks
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # MongoDB for our NestJS application - production configuration
+  mongodb:
+    image: mongo:latest
+    container_name: medicare-mongodb
+    # No ports exposed to the host in production for security
+    environment:
+      MONGO_INITDB_DATABASE: medicare
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-admin}
+    volumes:
+      - mongodb-data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - medicare-network
+    command: [ "--auth", "--wiredTigerCacheSizeGB", "1" ]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # Reverse proxy for production (optional)
+  nginx:
+    image: nginx:stable
+    container_name: medicare-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - hapi-fhir
+    networks:
+      - medicare-network
+    restart: unless-stopped
+
+volumes:
+  hapi-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH:-./data}/hapi-data
+  mongodb-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH:-./data}/mongodb-data
+  postgres-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH:-./data}/postgres-data
+
+networks:
+  medicare-network:
+    driver: bridge

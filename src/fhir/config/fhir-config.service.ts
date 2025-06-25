@@ -19,7 +19,7 @@ export class FhirConfigService {
         return (
             this.options.serverUrl ||
             this.configService.get<string>('fhir.serverUrl') ||
-            'http://localhost:9090/fhir'
+            'http://hapi-fhir:8080/fhir'
         );
     }
 

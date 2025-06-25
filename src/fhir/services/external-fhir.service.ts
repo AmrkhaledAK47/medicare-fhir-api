@@ -19,7 +19,7 @@ export class ExternalFhirService {
         private readonly configService: ConfigService,
         private readonly httpService: HttpService,
     ) {
-        this.baseUrl = this.configService.get<string>('FHIR_SERVER_URL') || 'http://localhost:9090/fhir';
+        this.baseUrl = this.configService.get<string>('FHIR_SERVER_URL') || 'http://hapi-fhir:8080/fhir';
         this.setupAuthHeaders();
         this.setupHttpsAgent();
     }
@@ -265,10 +265,17 @@ export class ExternalFhirService {
         try {
             const queryParams = new URLSearchParams();
 
-            // Add search parameters to URL
+            // List of NestJS-specific parameters that should not be passed to FHIR
+            const nestJsSpecificParams = ['sortDirection', 'sort', 'page', 'limit', 'search'];
+
+            // Add search parameters to URL, filtering out NestJS-specific ones
             Object.entries(searchParams).forEach(([key, value]) => {
-                queryParams.append(key, value);
+                if (!nestJsSpecificParams.includes(key) && value !== undefined && value !== null) {
+                    queryParams.append(key, value);
+                }
             });
+
+            this.logger.debug(`Searching ${resourceType} with filtered params: ${queryParams.toString()}`);
 
             const response = await firstValueFrom(
                 this.httpService.get<T>(

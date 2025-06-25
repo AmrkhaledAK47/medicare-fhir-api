@@ -6,6 +6,7 @@ import * as nodemailer from 'nodemailer';
 export class EmailService {
     private readonly logger = new Logger(EmailService.name);
     private transporter: nodemailer.Transporter;
+    private emailEnabled = true;
 
     constructor(private configService: ConfigService) {
         this.initializeTransporter();
@@ -13,6 +14,13 @@ export class EmailService {
 
     private async initializeTransporter() {
         const emailConfig = this.configService.get('app.email');
+
+        // Check if required email configuration is available
+        if (!emailConfig.user || !emailConfig.password) {
+            this.logger.warn('Email credentials not provided. Email sending will be disabled.');
+            this.emailEnabled = false;
+            return;
+        }
 
         this.transporter = nodemailer.createTransport({
             service: emailConfig.service,
@@ -29,8 +37,11 @@ export class EmailService {
         try {
             await this.transporter.verify();
             this.logger.log('SMTP connection established successfully');
+            this.emailEnabled = true;
         } catch (error) {
             this.logger.error(`Failed to establish SMTP connection: ${error.message}`);
+            this.logger.warn('Email sending will be disabled. Using console logging instead.');
+            this.emailEnabled = false;
         }
     }
 
@@ -68,14 +79,19 @@ export class EmailService {
                 `
             };
 
-            // For testing purposes, log the access code to the console
+            // Always log the access code to the console for development
             console.log(`========================================`);
             console.log(`EMAIL SENT: Registration code for ${email}`);
             console.log(`ACCESS CODE: ${accessCode}`);
             console.log(`========================================`);
 
-            await this.transporter.sendMail(mailOptions);
-            this.logger.log(`Registration code sent to ${email}`);
+            // Only attempt to send email if enabled
+            if (this.emailEnabled && this.transporter) {
+                await this.transporter.sendMail(mailOptions);
+                this.logger.log(`Registration code sent to ${email}`);
+            } else {
+                this.logger.warn(`Email disabled. Registration code for ${email} logged to console only.`);
+            }
             return true;
         } catch (error) {
             this.logger.error(`Failed to send registration code to ${email}: ${error.message}`);
@@ -99,20 +115,25 @@ export class EmailService {
             </div>
         `;
 
-        // For testing purposes, log the reset code to the console
+        // Always log the reset code to the console for development
         console.log(`========================================`);
         console.log(`EMAIL SENT: Password reset code for ${email}`);
         console.log(`RESET CODE: ${resetCode}`);
         console.log(`========================================`);
 
         try {
-            await this.transporter.sendMail({
-                from: this.configService.get('app.email.from'),
-                to: email,
-                subject: subject,
-                html: html
-            });
-            this.logger.log(`Password reset code sent to ${email}`);
+            // Only attempt to send email if enabled
+            if (this.emailEnabled && this.transporter) {
+                await this.transporter.sendMail({
+                    from: this.configService.get('app.email.from'),
+                    to: email,
+                    subject: subject,
+                    html: html
+                });
+                this.logger.log(`Password reset code sent to ${email}`);
+            } else {
+                this.logger.warn(`Email disabled. Password reset code for ${email} logged to console only.`);
+            }
             return true;
         } catch (error) {
             this.logger.error(`Failed to send password reset code to ${email}: ${error.message}`);

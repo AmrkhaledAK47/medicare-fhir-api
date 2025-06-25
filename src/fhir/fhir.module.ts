@@ -62,6 +62,7 @@ import { TerminologyController } from './controllers/terminology.controller';
 import { ValidationController } from './controllers/validation.controller';
 import { DocumentationController } from './controllers/documentation.controller';
 import { ExamplePaginationController } from './controllers/example-pagination.controller';
+import { AllergyIntoleranceController } from './controllers/allergy-intolerance.controller';
 
 // Import middleware
 import { FhirAuthorizationMiddleware } from './middleware/fhir-authorization.middleware';
@@ -187,6 +188,7 @@ export class FhirModule implements OnModuleInit {
             ValidationController,
             DocumentationController,
             ExamplePaginationController,
+            AllergyIntoleranceController,
         ];
 
         const exports = [

@@ -3,7 +3,7 @@ import { registerAs } from '@nestjs/config';
 export default registerAs('fhir', () => ({
     // HAPI FHIR server connection
     enableHapiFhir: process.env.ENABLE_HAPI_FHIR === 'true',
-    hapiFhirUrl: process.env.HAPI_FHIR_URL || 'http://localhost:9090/fhir',
+    hapiFhirUrl: process.env.HAPI_FHIR_URL || 'http://hapi-fhir:8080/fhir',
     maxRetries: parseInt(process.env.FHIR_MAX_RETRIES || '3', 10),
     retryDelay: parseInt(process.env.FHIR_RETRY_DELAY || '1000', 10),
 

@@ -27,9 +27,14 @@ export class FhirService {
         this.baseUrl = this.configService.get<string>('app.fhir.serverBaseUrl');
         this.maxRetries = 3; // Max number of retries for failed requests
         this.retryDelay = 1000; // Delay between retries in ms
-        this.hapiFhirUrl = this.configService.get<string>('HAPI_FHIR_URL') || 'http://localhost:9090/fhir';
+        this.hapiFhirUrl = this.configService.get<string>('FHIR_SERVER_URL') || 'http://hapi-fhir:8080/fhir';
         this.useHapiFhir = this.configService.get<boolean>('USE_HAPI_FHIR') || false;
         this.logger.log(`FHIR Service initialized. HAPI FHIR URL: ${this.hapiFhirUrl}, Using HAPI: ${this.useHapiFhir}`);
+
+        // Set the baseUrl to the hapiFhirUrl if it's not already set
+        if (!this.baseUrl) {
+            this.baseUrl = this.hapiFhirUrl;
+        }
     }
 
     private getRequestConfig(): AxiosRequestConfig {
@@ -299,8 +304,21 @@ export class FhirService {
     // Search for FHIR resources
     async searchResources(resourceType: string, params: Record<string, string>): Promise<any> {
         try {
-            const queryString = new URLSearchParams(params).toString();
+            // List of NestJS-specific parameters that should not be passed to FHIR
+            const nestJsSpecificParams = ['sortDirection', 'sort', 'page', 'limit', 'search'];
+
+            // Filter out NestJS-specific parameters
+            const filteredParams = Object.keys(params)
+                .filter(key => !nestJsSpecificParams.includes(key))
+                .reduce((obj, key) => {
+                    obj[key] = params[key];
+                    return obj;
+                }, {} as Record<string, string>);
+
+            const queryString = new URLSearchParams(filteredParams).toString();
             const url = `${this.baseUrl}/${resourceType}?${queryString}`;
+
+            this.logger.debug(`Searching ${resourceType} with filtered params: ${queryString}`);
 
             return await this.retryableRequest(
                 async () => {
@@ -387,7 +405,7 @@ export class FhirService {
     }
 
     /**
-     * Search FHIR resources in the HAPI FHIR server
+     * Search for resources in HAPI FHIR server
      */
     async searchFhirResources(
         resourceType: string,
@@ -398,9 +416,12 @@ export class FhirService {
             // Create URL search params
             const queryParams = new URLSearchParams();
 
-            // Add search parameters
+            // List of NestJS-specific parameters that should not be passed to FHIR
+            const nestJsSpecificParams = ['sortDirection', 'sort', 'page', 'limit', 'search'];
+
+            // Add search parameters, filtering out NestJS-specific ones
             Object.entries(params).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
+                if (value !== undefined && value !== null && !nestJsSpecificParams.includes(key)) {
                     queryParams.append(key, String(value));
                 }
             });
@@ -410,6 +431,7 @@ export class FhirService {
             queryParams.append('_getpagesoffset', String((pagination.page - 1) * pagination.count));
 
             // Make request to HAPI FHIR server
+            this.logger.debug(`Searching ${resourceType} with params: ${queryParams.toString()}`);
             const response = await firstValueFrom(
                 this.httpService.get(`${this.hapiFhirUrl}/${resourceType}`, {
                     params: queryParams,

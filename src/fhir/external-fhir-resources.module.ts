@@ -28,7 +28,7 @@ export class ExternalFhirResourcesModule {
                 {
                     provide: 'EXTERNAL_FHIR_OPTIONS',
                     useValue: {
-                        serverUrl: options.serverUrl || process.env.FHIR_SERVER_URL || 'http://localhost:9090/fhir',
+                        serverUrl: options.serverUrl || process.env.FHIR_SERVER_URL || 'http://hapi-fhir:8080/fhir',
                         version: options.version || process.env.FHIR_VERSION || 'R4',
                         localResources: options.localResources ||
                             (process.env.LOCAL_FHIR_RESOURCES ? process.env.LOCAL_FHIR_RESOURCES.split(',') : [

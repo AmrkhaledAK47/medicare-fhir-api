@@ -11,7 +11,7 @@ export default registerAs('app', () => ({
         uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/fhir_ehr',
     },
     fhir: {
-        serverBaseUrl: process.env.FHIR_SERVER_BASE_URL || 'http://localhost:9090/fhir',
+        serverBaseUrl: process.env.FHIR_SERVER_URL || 'http://hapi-fhir:8080/fhir',
     },
     email: {
         service: process.env.EMAIL_SERVICE || 'gmail',

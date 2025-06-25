@@ -1,5 +1,117 @@
 # MediCare FHIR API
 
+A modern FHIR-compliant API for healthcare data management built with NestJS and HAPI FHIR.
+
+## Overview
+
+MediCare FHIR API provides a comprehensive RESTful interface for interacting with healthcare data using the HL7 FHIR (Fast Healthcare Interoperability Resources) standard. The API supports various healthcare resources, authentication, and role-based access controls.
+
+## Features
+
+- **FHIR-Compliant**: Implements the FHIR standard for healthcare data interoperability
+- **Advanced Search**: Supports complex search parameters, including chained and composite searches
+- **Role-Based Access Control**: Different access levels for patients, practitioners, and administrators
+- **JWT Authentication**: Secure authentication using JSON Web Tokens
+- **Docker Integration**: Easy deployment with Docker containers
+- **Comprehensive Documentation**: API documentation and testing plans included
+
+## Supported FHIR Resources
+
+- Patient
+- Practitioner
+- Organization
+- Encounter
+- Observation
+- DiagnosticReport
+- Condition
+- Procedure
+- AllergyIntolerance
+- MedicationRequest
+- Medication
+
+## Advanced FHIR Features
+
+- **Composite Search Parameters**: Combine multiple search criteria for complex queries
+- **Chained Parameters**: Search based on properties of referenced resources
+- **Reference Range Searches**: Find observations with specific reference ranges
+- **Reverse Chaining**: Find resources that reference specific resources
+- **Include and Reverse Include**: Include referenced resources in responses
+- **Custom Endpoints**: Specialized endpoints for common clinical queries
+
+## Getting Started
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Node.js 16+ (for development)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/medicare-fhir-api.git
+cd medicare-fhir-api
+```
+
+2. Start the Docker containers:
+```bash
+docker-compose up -d
+```
+
+3. Generate an authentication token:
+```bash
+curl -X POST "http://localhost:3000/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@example.com",
+    "password": "Admin123!"
+  }' | jq -r '.accessToken' > token.txt
+```
+
+### Testing
+
+Run the test scripts to verify API functionality:
+
+```bash
+./test/observation-api-test.sh
+```
+
+## API Documentation
+
+Detailed API documentation can be found in the `docs` directory:
+
+- [API Documentation](docs/API-DOCUMENTATION.md): General API documentation
+- [API Testing Plan](docs/API-TESTING-PLAN.md): Comprehensive testing plan
+- [Observation Enhancements](docs/OBSERVATION-ENHANCEMENTS.md): Documentation for Observation resource enhancements
+- [Enhancements Summary](docs/ENHANCEMENTS-SUMMARY.md): Summary of all API enhancements
+
+## Architecture
+
+The API is built with the following technologies:
+
+- **NestJS**: A progressive Node.js framework for building efficient and scalable server-side applications
+- **HAPI FHIR**: An open-source implementation of the FHIR specification
+- **PostgreSQL**: Database for storing user information
+- **Docker**: Containerization for easy deployment
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -am 'Add my feature'`
+4. Push to the branch: `git push origin feature/my-feature`
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- [HL7 FHIR](https://www.hl7.org/fhir/) for the FHIR specification
+- [HAPI FHIR](https://hapifhir.io/) for the FHIR server implementation
+- [NestJS](https://nestjs.com/) for the API framework
+
 [![Deploy to DigitalOcean](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/YOUR_GITHUB_USERNAME/fhir-ehr-platform/tree/main)
 
 ## Quick Deployment
@@ -26,6 +138,7 @@ To deploy this application to DigitalOcean App Platform:
 [![FHIR v4.0.1](https://img.shields.io/badge/FHIR-v4.0.1-green.svg)](https://www.hl7.org/fhir/)
 [![NestJS](https://img.shields.io/badge/NestJS-v10.0.0-red.svg)](https://nestjs.com)
 [![MongoDB](https://img.shields.io/badge/MongoDB-v4.4+-darkgreen.svg)](https://www.mongodb.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v14+-blue.svg)](https://www.postgresql.org/)
 
 ## Table of Contents
 
@@ -33,10 +146,16 @@ To deploy this application to DigitalOcean App Platform:
 - [Tech Stack](#tech-stack)
 - [Features](#features)
 - [Getting Started](#getting-started)
+  - [Quick Setup](#quick-setup)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Environment Setup](#environment-setup)
   - [Running the Server](#running-the-server)
+- [PostgreSQL Integration](#postgresql-integration)
+  - [Benefits](#benefits)
+  - [Setup](#setup)
+  - [Testing](#testing)
+  - [Monitoring](#monitoring)
 - [Architecture](#architecture)
   - [System Architecture](#system-architecture)
   - [Application Layers](#application-layers)
@@ -84,6 +203,7 @@ The platform supports standard FHIR resources, including Patient, Practitioner, 
 - **Secure Authentication**: JWT-based authentication with access code verification
 - **Role-Based Access Control**: Granular permissions for Admin, Practitioner, and Patient roles
 - **HAPI FHIR Integration**: Optional integration with HAPI FHIR server for advanced functionality
+- **PostgreSQL Database**: Robust, scalable PostgreSQL database for HAPI FHIR server
 - **Advanced Search & Filtering**: Comprehensive search capabilities across all resources
 - **Pagination**: Efficient data retrieval with standardized pagination patterns
 - **Audit Logging**: Complete audit trail of all data access and modifications
@@ -92,14 +212,15 @@ The platform supports standard FHIR resources, including Patient, Practitioner, 
 ## Tech Stack
 
 - **Framework**: [NestJS](https://nestjs.com/) - A progressive Node.js framework
-- **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/)
+- **User Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/)
+- **FHIR Database**: [PostgreSQL](https://www.postgresql.org/) - For scalable HAPI FHIR storage
 - **Authentication**: [JWT](https://jwt.io/) with [Passport](http://www.passportjs.org/)
 - **API Documentation**: [Swagger/OpenAPI](https://swagger.io/)
 - **Validation**: [class-validator](https://github.com/typestack/class-validator)
-- **FHIR Server**: [HAPI FHIR](https://hapifhir.io/) (optional integration)
+- **FHIR Server**: [HAPI FHIR](https://hapifhir.io/)
 - **Email**: [Nodemailer](https://nodemailer.com/)
 - **Testing**: [Jest](https://jestjs.io/)
-- **Containerization**: [Docker](https://www.docker.com/)
+- **Containerization**: [Docker](https://www.docker.com/) and Docker Compose
 
 ## Features
 
@@ -126,11 +247,22 @@ The platform supports standard FHIR resources, including Patient, Practitioner, 
 
 ## Getting Started
 
+### Quick Setup
+
+For a complete setup that includes PostgreSQL, HAPI FHIR, MongoDB, and the NestJS API:
+
+```bash
+./scripts/setup-test-everything.sh
+```
+
+This will start all services, generate authentication tokens, and test all API endpoints.
+
+For detailed PostgreSQL setup instructions, see [POSTGRESQL-SETUP-README.md](POSTGRESQL-SETUP-README.md).
+
 ### Prerequisites
 
-- Node.js (v16+)
-- MongoDB (v4.4+)
-- Docker and Docker Compose (optional, for HAPI FHIR server)
+- Docker and Docker Compose
+- Node.js (v16+) for development
 - Git
 
 ### Installation
@@ -142,126 +274,131 @@ git clone https://github.com/your-org/medicare-api.git
 cd medicare-api
 ```
 
-2. Install dependencies:
+2. Set up environment variables (see [Environment Setup](#environment-setup))
+
+3. Start all services:
 
 ```bash
-npm install
+./scripts/setup-and-verify.sh
 ```
 
-3. Set up environment variables (see [Environment Setup](#environment-setup))
-
-4. Start the development server:
-
-```bash
-npm run start:dev
-```
-
-The API will be available at http://localhost:3000/api with Swagger documentation at http://localhost:3000/api/docs.
+The API will be available at:
+- NestJS API: http://localhost:3000/api 
+- API Documentation: http://localhost:3000/api-docs
+- HAPI FHIR Server: http://localhost:9090/fhir
 
 ### Environment Setup
 
-Create a `.env` file in the root directory:
-
-```
-# API Configuration
-PORT=3000
-NODE_ENV=development
-API_BASE_URL=http://localhost:3000/api
-
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_key
-JWT_EXPIRES_IN=1d
-JWT_REFRESH_EXPIRES_IN=7d
-
-# MongoDB Configuration
-MONGODB_URI=mongodb://localhost:27017/medicare
-MONGODB_TEST_URI=mongodb://localhost:27017/medicare_test
-
-# Email Configuration
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=your_email@example.com
-SMTP_PASS=your_email_password
-EMAIL_FROM=Medicare API <no-reply@medicare-api.com>
-
-# HAPI FHIR Server (optional)
-FHIR_SERVER_URL=http://localhost:9090/fhir
-FHIR_SERVER_USERNAME=fhiruser
-FHIR_SERVER_PASSWORD=fhirpassword
-
-# Upload Configuration
-UPLOAD_DIR=uploads
-MAX_FILE_SIZE=5000000
-```
+Create a `.env` file in the root directory (see `.env.example` for a template).
 
 ### Running the Server
 
-#### Development Mode
+#### Development Mode with Docker
 
 ```bash
+./scripts/setup-and-verify.sh
+```
+
+#### Development Mode Without Docker
+
+```bash
+npm install
 npm run start:dev
 ```
 
 #### Production Mode
 
 ```bash
-npm run build
-npm run start:prod
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
-#### With Docker
+## PostgreSQL Integration
+
+### Benefits
+
+The PostgreSQL database integration for HAPI FHIR provides several key benefits:
+
+1. **Data Persistence**: Unlike H2 in-memory database, PostgreSQL persists data across restarts
+2. **Scalability**: Handles larger volumes of healthcare data
+3. **Performance**: Optimized for FHIR workloads with custom extensions and functions
+4. **Reliability**: Enterprise-grade database with proven track record in healthcare
+5. **Search Capabilities**: Advanced indexing and search functionality
+
+### Setup
+
+To set up the PostgreSQL database for HAPI FHIR:
 
 ```bash
-docker-compose up -d
+# Complete setup script
+./scripts/setup-and-verify.sh
+
+# Or individual scripts
+docker-compose up -d postgres
+./scripts/initialize-postgres.sql
 ```
+
+For full setup details, see [DATABASE_MIGRATION_GUIDE.md](docs/DATABASE_MIGRATION_GUIDE.md).
+
+### Testing
+
+To test the PostgreSQL configuration:
+
+```bash
+# Generate authentication tokens
+node ./scripts/generate-auth-token.js
+
+# Test API endpoints
+node ./scripts/test-api-endpoints.js
+
+# Benchmark API performance
+./scripts/benchmark.sh -e /fhir/Patient -n 100 -c 10
+```
+
+### Monitoring
+
+To monitor resource usage:
+
+```bash
+# Monitor container resources (updates every 5 seconds)
+./scripts/monitor-resources.sh
+
+# Check logs
+docker-compose logs -f
+```
+
+For detailed testing procedures, see [TESTING_POSTGRESQL_CONFIG.md](docs/TESTING_POSTGRESQL_CONFIG.md).
 
 ## Architecture
 
-The MediCare FHIR API follows a modular architecture based on NestJS:
+The MediCare FHIR API follows a modular architecture based on NestJS with PostgreSQL for the HAPI FHIR server and MongoDB for user authentication:
 
 ```
-src/
-├── auth/             # Authentication and authorization
-├── config/           # Configuration modules
-├── email/            # Email service
-├── fhir/             # FHIR resources and services
-│   ├── controllers/  # Resource controllers
-│   ├── dto/          # Data transfer objects
-│   ├── schemas/      # MongoDB schemas
-│   └── services/     # Resource services
-├── health/           # Health check endpoints
-├── users/            # User management
-├── pagination/       # Pagination functionality
-└── common/           # Shared utilities and interfaces
-```
-
-### System Architecture
-
-```
-┌─────────────────┐     ┌──────────────────────────────────────────────────────┐    ┌─────────────────┐
-│                 │     │                   MediCare API                        │    │                 │
-│                 │     │  ┌───────────────┐         ┌───────────────┐         │    │                 │
-│  Client Apps    │────▶│  │ Authentication│─────────▶ FHIR Resource │         │    │   MongoDB       │
-│  (Web/Mobile)   │     │  │ & Authorization│◀────────│ Controllers   │───────────▶│   Database      │
-│                 │◀────│  └───────────────┘         └───────────────┘         │    │                 │
-└─────────────────┘     │           │                        │                  │    └─────────────────┘
-                        │           │                        │                  │
+┌─────────────────┐     ┌──────────────────────────────────────────────────────┐
+│                 │     │                   MediCare API                        │
+│                 │     │  ┌───────────────┐         ┌───────────────┐         │
+│  Client Apps    │────▶│  │ Authentication│─────────▶ FHIR Resource │         │
+│  (Web/Mobile)   │     │  │ & Authorization│◀────────│ Controllers   │───────────▶┌─────────────────┐
+│                 │◀────│  └───────────────┘         └───────────────┘         │   │   MongoDB       │
+└─────────────────┘     │           │                        │                  │   │   (Users)       │
+                        │           │                        │                  │   └─────────────────┘
                         │  ┌────────▼────────┐    ┌──────────▼──────────┐      │
                         │  │   User Service  │    │  FHIR Services      │      │
                         │  │                 │    │                     │      │
                         │  └─────────────────┘    └─────────────────────┘      │
-                        │           │                        │                  │
-                        │  ┌────────▼────────┐    ┌──────────▼──────────┐      │
-                        │  │  Email Service  │    │ Validation Service  │      │    ┌─────────────────┐
-                        │  │                 │    │                     │      │    │                 │
-                        │  └─────────────────┘    └─────────────────────┘      │───▶│  External      │
-                        │                                    │                  │    │  FHIR Server   │
-                        │  ┌──────────────────┐   ┌──────────▼──────────┐      │◀───│  (HAPI FHIR)   │
-                        │  │ Static File      │   │ Pagination &        │      │    │                 │
-                        │  │ Server (Avatars) │   │ Search Services     │      │    └─────────────────┘
-                        │  └──────────────────┘   └─────────────────────┘      │
-                        │                                                       │
-                        └───────────────────────────────────────────────────────┘
+                        │                                    │                  │
+                        │                                    │                  │   ┌─────────────────┐
+                        │                                    ▼                  │   │                 │
+                        │                          ┌───────────────────┐       │───▶│  HAPI FHIR     │
+                        │                          │ HAPI FHIR Client  │       │   │  Server         │
+                        │                          └───────────────────┘       │◀──│                 │
+                        │                                                       │   └────────┬────────┘
+                        │                                                       │            │
+                        └───────────────────────────────────────────────────────┘            │
+                                                                                             ▼
+                                                                                    ┌─────────────────┐
+                                                                                    │  PostgreSQL     │
+                                                                                    │  Database       │
+                                                                                    └─────────────────┘
 ```
 
 The updated architecture diagram shows:
@@ -328,7 +465,7 @@ Key features of HAPI FHIR include:
 The MediCare API integrates with HAPI FHIR in multiple ways:
 
 1. **HAPI FHIR Client**: The API uses HAPI FHIR client libraries to interact with external FHIR servers
-2. **HAPI FHIR Server**: The API can connect to a HAPI FHIR server as a backend for advanced FHIR capabilities
+2. **HAPI FHIR Server**: The API connects to a HAPI FHIR server as a backend for advanced FHIR capabilities
 3. **HAPI FHIR Libraries**: The API utilizes HAPI FHIR libraries for validation, parsing, and resource handling
 
 Benefits of integration include:
@@ -341,30 +478,48 @@ Benefits of integration include:
 
 ### HAPI FHIR Server Setup
 
-To use the HAPI FHIR server integration:
+Our implementation uses a PostgreSQL-backed HAPI FHIR server for improved scalability and data persistence. This represents an upgrade from the default H2 in-memory database that comes with the standard HAPI FHIR server.
 
-1. Start the HAPI FHIR server using Docker:
+#### Key Database Improvements
 
-```bash
-docker-compose -f hapi-fhir-docker-compose.yml up -d
-```
+- **Persistence**: PostgreSQL provides robust data persistence, unlike the H2 in-memory database
+- **Scalability**: PostgreSQL can handle much larger FHIR resource collections
+- **Performance**: Optimized for high-throughput healthcare data operations
+- **Reliability**: Supports database replication, backup, and recovery mechanisms
+- **Standards Compliance**: Fully supports all FHIR operations within a production environment
 
-2. Configure the MediCare API to use the HAPI FHIR server:
+To use the HAPI FHIR server with PostgreSQL:
 
-```
-# .env file
-FHIR_SERVER_URL=http://localhost:9090/fhir
-FHIR_SERVER_USERNAME=fhiruser
-FHIR_SERVER_PASSWORD=fhirpassword
-```
-
-3. Restart the MediCare API server:
+1. Start the infrastructure using Docker Compose:
 
 ```bash
-npm run start:dev
+docker-compose up -d
 ```
 
-Once configured, the API will automatically route appropriate FHIR operations to the HAPI FHIR server while still enforcing its own authentication and authorization rules. This provides the best of both worlds: the security and custom functionality of the MediCare API alongside the comprehensive FHIR capabilities of HAPI FHIR.
+2. Verify the setup is working correctly:
+
+```bash
+./scripts/verify-postgres-setup.sh
+```
+
+3. Access the HAPI FHIR server at:
+   - http://localhost:9090/fhir
+
+#### Production Deployment
+
+For production deployments, use our production-ready configuration:
+
+```bash
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+This configuration includes:
+- Secured database connections (no exposed ports)
+- Optimized PostgreSQL settings for FHIR workloads
+- Proper volume management for data persistence
+- NGINX reverse proxy with SSL support
+
+See the [Deployment Guide](docs/DEPLOYMENT.md) for detailed instructions.
 
 ## API Documentation
 
@@ -590,421 +745,4 @@ The system supports three user roles, each with different permissions:
 - `GET /api/fhir/Encounter/patient/:patientId` - Get encounters for patient
 - `POST /api/fhir/Encounter` - Create encounter
 - `PUT /api/fhir/Encounter/:id` - Update encounter
-- `DELETE /api/fhir/Encounter/:id` - Delete encounter
-
-##### Condition Endpoints
-- `GET /api/fhir/Condition` - Get all conditions
-- `GET /api/fhir/Condition/:id` - Get condition by ID
-- `GET /api/fhir/Condition/$my-conditions` - Get current user's conditions
-- `GET /api/fhir/Condition/patient/:patientId` - Get conditions for patient
-- `GET /api/fhir/Condition/patient/:patientId/active` - Get active conditions for patient
-- `GET /api/fhir/Condition/$by-category` - Get conditions by category
-- `GET /api/fhir/Condition/encounter/:encounterId` - Get conditions for encounter
-- `POST /api/fhir/Condition` - Create condition
-- `PUT /api/fhir/Condition/:id` - Update condition
-- `DELETE /api/fhir/Condition/:id` - Delete condition
-
-##### Medication Endpoints
-- `GET /api/fhir/Medication` - Get all medications
-- `GET /api/fhir/Medication/:id` - Get medication by ID
-- `GET /api/fhir/Medication/$common` - Get common medications
-- `POST /api/fhir/Medication` - Create medication
-- `PUT /api/fhir/Medication/:id` - Update medication
-- `DELETE /api/fhir/Medication/:id` - Delete medication
-
-##### MedicationRequest Endpoints
-- `GET /api/fhir/MedicationRequest` - Get all medication requests
-- `GET /api/fhir/MedicationRequest/:id` - Get medication request by ID
-- `GET /api/fhir/MedicationRequest/$my-medications` - Get current user's medication requests
-- `GET /api/fhir/MedicationRequest/patient/:patientId/active` - Get active medication requests for patient
-- `GET /api/fhir/MedicationRequest/encounter/:encounterId` - Get medication requests for encounter
-- `POST /api/fhir/MedicationRequest` - Create medication request
-- `PUT /api/fhir/MedicationRequest/:id` - Update medication request
-- `DELETE /api/fhir/MedicationRequest/:id` - Delete medication request
-
-##### Procedure Endpoints
-- `GET /api/fhir/Procedure` - Get all procedures
-- `GET /api/fhir/Procedure/:id` - Get procedure by ID
-- `GET /api/fhir/Procedure/$my-procedures` - Get current user's procedures
-- `GET /api/fhir/Procedure/patient/:patientId` - Get procedures for patient
-- `GET /api/fhir/Procedure/$by-code` - Get procedures by code
-- `GET /api/fhir/Procedure/encounter/:encounterId` - Get procedures for encounter
-- `POST /api/fhir/Procedure` - Create procedure
-- `PUT /api/fhir/Procedure/:id` - Update procedure
-- `DELETE /api/fhir/Procedure/:id` - Delete procedure
-
-##### Questionnaire Endpoints
-- `GET /api/questionnaires` - Get all questionnaires
-- `GET /api/questionnaires/:id` - Get questionnaire by ID
-- `POST /api/questionnaires` - Create questionnaire
-- `PUT /api/questionnaires/:id` - Update questionnaire
-- `DELETE /api/questionnaires/:id` - Delete questionnaire
-
-##### Payment Endpoints
-- `GET /api/payments` - Get all payments
-- `GET /api/payments/:id` - Get payment by ID
-- `POST /api/payments` - Create payment
-- `PUT /api/payments/:id` - Update payment
-- `DELETE /api/payments/:id` - Delete payment
-
-##### Terminology Endpoints
-- `GET /api/fhir/terminology/validate-code` - Validate terminology code
-- `GET /api/fhir/terminology/expand` - Expand value set
-- `GET /api/fhir/terminology/translate` - Translate code between code systems
-- `GET /api/fhir/terminology/lookup` - Look up code details
-- `POST /api/fhir/terminology/find-matches` - Find matching codes
-
-##### Documentation Endpoints
-- `GET /api/fhir/documentation` - Get API documentation
-- `GET /api/fhir/documentation/examples/:resourceType` - Get examples for resource type
-- `GET /api/fhir/documentation/operations` - Get available operations
-- `GET /api/fhir/documentation/usage` - Get API usage information
-
-##### Health Check Endpoints
-- `GET /api/health` - Basic system health check
-- `GET /api/health/fhir-server` - FHIR server health check
-
-### Pagination
-
-All endpoints that return multiple resources support pagination using the following query parameters:
-
-- `page` - Page number (default: 1)
-- `limit` - Number of items per page (default: 10, max: 100)
-
-Example:
-```
-GET /api/fhir/Patient?page=2&limit=20
-```
-
-Response includes pagination metadata:
-```json
-{
-  "data": [...],
-  "meta": {
-    "totalItems": 100,
-    "itemsPerPage": 20,
-    "totalPages": 5,
-    "currentPage": 2
-  },
-  "links": {
-    "first": "/api/fhir/Patient?page=1&limit=20",
-    "previous": "/api/fhir/Patient?page=1&limit=20",
-    "current": "/api/fhir/Patient?page=2&limit=20",
-    "next": "/api/fhir/Patient?page=3&limit=20",
-    "last": "/api/fhir/Patient?page=5&limit=20"
-  }
-}
-```
-
-### Search Parameters
-
-FHIR resources support standard FHIR search parameters:
-
-- `_id` - Search by resource ID
-- `_lastUpdated` - Search by last updated date
-- `_tag` - Search by tag
-- `_profile` - Search by profile
-- `_security` - Search by security label
-- `_text` - Search by text content
-- `_content` - Search by content
-- `_list` - Search by list
-- `_has` - Reverse chained search
-- `_type` - Search by resource type
-
-Resource-specific parameters are also supported. For example, Patient resources support:
-
-- `name` - Search by patient name
-- `given` - Search by given name
-- `family` - Search by family name
-- `identifier` - Search by identifier
-- `gender` - Search by gender
-- `birthdate` - Search by birth date
-- `address` - Search by address
-- `email` - Search by email
-- `phone` - Search by phone number
-- `organization` - Search by managing organization
-- `practitioner` - Search by practitioner
-
-### Error Handling
-
-The API uses standardized error responses following the FHIR OperationOutcome format:
-
-```json
-{
-  "resourceType": "OperationOutcome",
-  "issue": [
-    {
-      "severity": "error",
-      "code": "invalid",
-      "diagnostics": "Invalid resource: The resource did not pass validation",
-      "details": {
-        "text": "Invalid resource: The resource did not pass validation"
-      }
-    }
-  ]
-}
-```
-
-Common HTTP status codes:
-
-- `200 OK` - Request succeeded
-- `201 Created` - Resource created successfully
-- `400 Bad Request` - Invalid request or validation error
-- `401 Unauthorized` - Authentication required
-- `403 Forbidden` - Insufficient permissions
-- `404 Not Found` - Resource not found
-- `409 Conflict` - Resource already exists
-- `422 Unprocessable Entity` - Validation error
-- `500 Internal Server Error` - Server error
-
-## Integration Guide
-
-### JavaScript/TypeScript Integration
-
-#### Using Axios
-
-```javascript
-import axios from 'axios';
-
-// Configure client
-const client = axios.create({
-  baseURL: 'http://localhost:3000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Login and set token
-async function login(email, password) {
-  try {
-    const response = await client.post('/auth/login', { email, password });
-    const token = response.data.accessToken;
-    
-    // Set token for future requests
-    client.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    return token;
-  } catch (error) {
-    console.error('Login failed:', error.response?.data || error.message);
-    throw error;
-  }
-}
-
-// Get patient list
-async function getPatients(searchParams = {}) {
-  try {
-    const response = await client.get('/fhir/Patient', { params: searchParams });
-    return response.data;
-  } catch (error) {
-    console.error('Failed to fetch patients:', error.response?.data || error.message);
-    throw error;
-  }
-}
-
-// Create a patient
-async function createPatient(patientData) {
-  try {
-    const response = await client.post('/fhir/Patient', patientData);
-    return response.data;
-  } catch (error) {
-    console.error('Failed to create patient:', error.response?.data || error.message);
-    throw error;
-  }
-}
-```
-
-### Python Integration
-
-```python
-import requests
-import json
-
-# Base configuration
-BASE_URL = 'http://localhost:3000/api'
-session = requests.Session()
-session.headers.update({'Content-Type': 'application/json'})
-
-def login(email, password):
-    """Login and set authorization token for future requests"""
-    response = requests.post(
-        f"{BASE_URL}/auth/login", 
-        json={"email": email, "password": password}
-    )
-    response.raise_for_status()
-    token = response.json()['accessToken']
-    session.headers.update({'Authorization': f'Bearer {token}'})
-    return token
-
-def get_patients(search_params=None):
-    """Get list of patients with optional search parameters"""
-    response = session.get(f"{BASE_URL}/fhir/Patient", params=search_params)
-    response.raise_for_status()
-    return response.json()
-
-def create_patient(patient_data):
-    """Create a new patient"""
-    response = session.post(f"{BASE_URL}/fhir/Patient", json=patient_data)
-    response.raise_for_status()
-    return response.json()
-
-def get_patient_encounters(patient_id):
-    """Get encounters for a specific patient"""
-    response = session.get(f"{BASE_URL}/fhir/Encounter/patient/{patient_id}")
-    response.raise_for_status()
-    return response.json()
-```
-
-### FHIR Client Libraries
-
-For more advanced FHIR operations, consider using dedicated FHIR client libraries:
-
-#### JavaScript/TypeScript
-- [fhir.js](https://github.com/FHIR/fhir.js)
-- [fhir-kit-client](https://github.com/Vermonster/fhir-kit-client)
-
-#### Python
-- [fhirclient](https://github.com/smart-on-fhir/client-py)
-- [fhir-resources](https://github.com/nazrulworld/fhir.resources)
-
-#### Java
-- [HAPI FHIR Client](https://hapifhir.io/hapi-fhir/docs/client/introduction.html)
-
-#### .NET
-- [FHIR .NET API](https://github.com/FirelyTeam/firely-net-sdk)
-
-## FHIR Resources
-
-### Supported Resources
-
-The API supports the following FHIR resources:
-
-- **Patient**: Core demographic information about individuals receiving healthcare services
-- **Practitioner**: Healthcare providers involved in patient care
-- **Organization**: Healthcare organizations providing services
-- **Encounter**: Interactions between patients and healthcare providers
-- **Observation**: Measurements and simple assertions about patients
-- **DiagnosticReport**: Results of diagnostic investigations
-- **Medication**: Medications and pharmaceutical products
-- **MedicationRequest**: Medication orders and prescriptions
-- **Procedure**: Actions performed on or for a patient during an encounter
-- **Condition**: Clinical conditions, problems, or diagnoses
-- **Questionnaire**: Structured sets of questions
-- **QuestionnaireResponse**: Answers to questions in Questionnaires
-- **Payment**: Financial transactions related to healthcare services
-
-### Resource Validation
-
-All FHIR resources undergo thorough validation at multiple levels:
-
-#### Schema Validation
-- Structural validation against FHIR R4 resource schemas
-- Data type and cardinality checking for all elements
-- Required field validation
-
-#### Reference Validation
-- Integrity checking of resource references (e.g., Patient references in Encounters)
-- Verification of reference existence when required
-- Proper formatting of reference URLs
-
-#### Business Rule Validation
-- Custom validation rules specific to healthcare workflows
-- Patient-practitioner relationship validation
-- Date consistency checks (e.g., birth date vs encounter date)
-
-#### Profile Validation
-- Support for validating resources against FHIR profiles
-- Ability to enforce organization-specific extensions and constraints
-- Implementation Guide conformance checking
-
-#### Resource Validation API
-
-You can validate resources without creating them using the validation endpoints:
-
-```
-# Validate a single resource
-POST /api/fhir/:resourceType/$validate
-
-# Validate a batch of resources
-POST /api/fhir/$validate-batch
-
-# Validate specific resource instance
-POST /api/fhir/:resourceType/:id/$validate
-```
-
-Validation responses use the FHIR OperationOutcome format to provide detailed information about validation issues:
-
-```json
-{
-  "resourceType": "OperationOutcome",
-  "issue": [
-    {
-      "severity": "error",
-      "code": "structure",
-      "diagnostics": "Patient.name.given: minimum required = 1, but only found 0",
-      "location": ["Patient.name[0].given"]
-    }
-  ]
-}
-```
-
-## Development Guide
-
-### Adding New Resources
-
-To add support for a new FHIR resource:
-
-1. Create a schema in `src/fhir/schemas/resource-name.schema.ts`
-2. Create DTOs in `src/fhir/dto/resource-name.dto.ts`
-3. Create a service in `src/fhir/services/resource-name.service.ts`
-4. Create a controller in `src/fhir/controllers/resource-name.controller.ts`
-5. Register the service and controller in the appropriate module
-
-### Custom Operations
-
-To add a custom operation:
-
-1. Add a method to the resource service
-2. Add an endpoint to the resource controller using `@Post('$operation-name')` or `@Get('$operation-name')`
-3. Implement the operation logic
-4. Update documentation
-
-### Testing
-
-Run tests using:
-
-```bash
-# Unit tests
-npm run test
-
-# E2E tests
-npm run test:e2e
-
-# Test coverage
-npm run test:cov
-```
-
-## Security Considerations
-
-- All endpoints (except login and registration) require authentication
-- JWT tokens expire after a configurable time (default: 1 day)
-- Role-based access control ensures users can only access appropriate resources
-- Access codes are required for user registration
-- Passwords are hashed using bcrypt
-- Audit logs track all data access and modifications
-
-## Contributing
-
-We welcome contributions to the MediCare FHIR API! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature-name`)
-3. Make your changes
-4. Run tests (`npm test`)
-5. Commit your changes (`git commit -m 'Add some feature'`)
-6. Push to the branch (`git push origin feature/your-feature-name`)
-7. Create a new Pull Request
-
-Please see our [Contributing Guide](CONTRIBUTING.md) for more information.
-
-## License
-
-This project is licensed under the [ISC License](LICENSE).
+- `DELETE /api/fhir/Encounter/:id`
