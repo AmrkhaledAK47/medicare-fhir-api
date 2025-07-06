@@ -1,0 +1,3602 @@
+[
+  {
+    "resourceType": "Observation",
+    "id": "obs-2875",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-05-06T18:23:22.549Z",
+    "valueQuantity": {
+      "value": 94,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-4144",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-06-06T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 83,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6707",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-05-17T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 98,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1940",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-04-23T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 70,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1050",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-05-24T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 70,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1431",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-06-18T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 108,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1007",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-04-13T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 114,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-5278",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-06-29T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 129,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6071",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-05-07T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 106,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1278",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-04-29T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 122,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2424",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-06-07T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 100,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-5105",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-04-25T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 111,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2566",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-04-24T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 82,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-3600",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-05-28T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 116,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-8372",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-04-28T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 116,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2407",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-04-09T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.7,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6135",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-05-25T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.9,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-4486",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-05-11T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1.2,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7895",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-06-21T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.6,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-4925",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-8699",
+      "display": "Sarah Smith"
+    },
+    "effectiveDateTime": "2025-06-18T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6153",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-05-19T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 62,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6861",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-04-09T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 67,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6110",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-04-26T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 74,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-3719",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-04-15T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 83,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1793",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-04-12T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 74,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0817",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-06-20T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 119,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1774",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-06-11T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 130,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2201",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-05-19T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 138,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-4770",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-04-12T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 120,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6047",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-05-21T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 117,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6298",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-06-22T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 113,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-9553",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-04-08T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 119,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-3186",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-05-25T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 93,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7947",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-05-04T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 117,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1077",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-04-23T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 83,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2612",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-04-28T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1772",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-04-23T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.6,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2600",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-05-25T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1.1,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7913",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-05-27T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.9,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0650",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9288",
+      "display": "Michael Johnson"
+    },
+    "effectiveDateTime": "2025-05-16T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1.2,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0868",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-06-27T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 70,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-4594",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-04-10T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 96,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2839",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-05-06T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 97,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-5084",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-05-03T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 73,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2789",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-06-03T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 68,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-3964",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-05-10T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 105,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-8787",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-06-25T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 113,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7855",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-06-07T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 120,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2512",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-04-20T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 107,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-3618",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-05-12T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 139,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2145",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-06-27T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 107,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6721",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-04-07T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 73,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0648",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-06-07T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 71,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2094",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-05-23T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 103,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-8021",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-06-03T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 90,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7264",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-04-10T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.9,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-9343",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-06-19T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1.1,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-8166",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-05-29T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.8,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-3660",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-05-30T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.9,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2340",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-7568",
+      "display": "Jessica Williams"
+    },
+    "effectiveDateTime": "2025-04-13T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.7,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0606",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-05-09T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 94,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-5311",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-06-14T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 98,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6347",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-06-17T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 84,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-4015",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-05-20T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 99,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-5154",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-06-27T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 79,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-4122",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-05-28T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 114,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0244",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-05-30T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 106,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-9242",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-05-04T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 105,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-9550",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-05-30T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 121,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7304",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-05-31T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 140,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-9667",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-05-26T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 105,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-4599",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-04-19T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 77,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-5984",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-04-21T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 97,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7571",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-07-02T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 83,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-9582",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-06-16T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 115,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1310",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-05-27T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1.1,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0904",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-06-05T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1.1,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-6519",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-06-06T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7174",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-05-14T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.8,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-5695",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-9912",
+      "display": "Robert Brown"
+    },
+    "effectiveDateTime": "2025-06-20T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1.1,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-9275",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-13T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 83,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0830",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-04T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 60,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2175",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-11T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 93,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7183",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-06-18T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 74,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0380",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8867-4",
+          "display": "Heart rate"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-22T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 68,
+      "unit": "beats/minute",
+      "system": "http://unitsofmeasure.org",
+      "code": "/min"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-9922",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-04-24T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 110,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2762",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-22T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 117,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0370",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-02T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 103,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7421",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-04-11T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 137,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-8717",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs",
+            "display": "Vital Signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "8480-6",
+          "display": "Systolic blood pressure"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-04T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 110,
+      "unit": "mmHg",
+      "system": "http://unitsofmeasure.org",
+      "code": "mm[Hg]"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-1479",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-23T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 107,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-8085",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-04-29T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 108,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-0753",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-20T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 106,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-5819",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-06-27T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 109,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-7585",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2339-0",
+          "display": "Glucose"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-04-09T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 90,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-9407",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-13T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1.2,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2674",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-06-23T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.9,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-9641",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-05-12T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 1.1,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-3919",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-06-29T18:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.7,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  },
+  {
+    "resourceType": "Observation",
+    "id": "obs-2974",
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory",
+            "display": "Laboratory"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "2160-0",
+          "display": "Creatinine"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "Patient/patient-0510",
+      "display": "James Jones"
+    },
+    "effectiveDateTime": "2025-04-06T19:23:22.550Z",
+    "valueQuantity": {
+      "value": 0.9,
+      "unit": "mg/dL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mg/dL"
+    }
+  }
+]

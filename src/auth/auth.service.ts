@@ -7,13 +7,15 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { UserStatus, UserRole, User, UserDocument } from '../users/schemas/user.schema';
 import { EmailService } from '../email/email.service';
+import { AccessCodesService } from '../access-codes/access-codes.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private usersService: UsersService,
         private jwtService: JwtService,
-        private emailService: EmailService
+        private emailService: EmailService,
+        private accessCodesService: AccessCodesService
     ) { }
 
     async login(loginDto: LoginDto) {
@@ -43,32 +45,73 @@ export class AuthService {
 
     async register(registerDto: RegisterDto) {
         const { email, accessCode } = registerDto;
-
-        // Check if user already exists and is active
-        const existingUser = await this.usersService.findByEmail(email);
-
-        if (existingUser && existingUser.status === UserStatus.ACTIVE) {
-            throw new ConflictException('User with this email already exists');
-        }
+        console.log('Register called with email:', email, 'accessCode:', accessCode);
 
         try {
+            // Check if user already exists and is active
+            const existingUser = await this.usersService.findByEmail(email);
+            console.log('Existing user check:', existingUser ? 'Found' : 'Not found');
+
+            if (existingUser && existingUser.status === UserStatus.ACTIVE) {
+                console.log('User exists and is active, throwing ConflictException');
+                throw new ConflictException('User with this email already exists');
+            }
+
             // Check if this is the first user being created (first admin exception)
             const userCount = await this.usersService.countUsers();
+            console.log('Current user count:', userCount);
 
             // If access code is not provided and this isn't the first user, reject
             if (!accessCode && userCount > 0) {
+                console.log('Access code required for non-first user');
                 throw new BadRequestException('Access code is required for registration');
             }
 
+            let verifiedAccessCode = null;
+
             // If access code is provided, verify it
             if (accessCode) {
-                // This will validate the access code and get the pre-created user
-                await this.usersService.verifyAccessCode(email, accessCode);
+                try {
+                    console.log('Verifying access code:', accessCode);
+                    // Verify the access code first
+                    const accessCodeModel = await this.accessCodesService.verify(accessCode);
+                    console.log('Access code verified successfully:', accessCodeModel);
+
+                    // Store it for later use
+                    verifiedAccessCode = accessCodeModel;
+
+                    // Validate that the email matches the one the code was sent to
+                    if (accessCodeModel.recipientEmail && accessCodeModel.recipientEmail !== email) {
+                        console.log('Email mismatch:', accessCodeModel.recipientEmail, 'vs', email);
+                        throw new BadRequestException('Access code is not valid for this email address');
+                    }
+                } catch (error) {
+                    console.error('Access code verification failed:', error);
+                    throw new BadRequestException(`Invalid access code: ${error.message}`);
+                }
             }
 
-            const user = await this.usersService.create(registerDto);
+            // Create the user with any FHIR resource information from the access code
+            const fhirResourceInfo = verifiedAccessCode ? {
+                fhirResourceId: verifiedAccessCode.resourceId,
+                fhirResourceType: verifiedAccessCode.resourceType,
+                role: verifiedAccessCode.role.toLowerCase() as UserRole
+            } : null;
+
+            console.log('Creating user with FHIR resource info:', fhirResourceInfo);
+            const user = await this.usersService.create(registerDto, fhirResourceInfo);
+            console.log('User created successfully:', user._id);
+
+            // Mark the access code as used
+            if (verifiedAccessCode) {
+                console.log('Marking access code as used:', accessCode);
+                await this.accessCodesService.markAsUsed(accessCode, user.id);
+                console.log('Access code marked as used');
+            }
+
             return this.generateToken(user);
         } catch (error) {
+            console.error('Registration error:', error);
             if (error instanceof ConflictException || error instanceof BadRequestException || error instanceof NotFoundException) {
                 throw error; // Re-throw validation errors
             }
@@ -157,5 +200,62 @@ export class AuthService {
         await user.save();
 
         return { message: 'Password has been reset successfully' };
+    }
+
+    // Get current user profile
+    async getUserProfile(userInfo: any) {
+        console.log('getUserProfile called with userInfo:', userInfo);
+
+        // If userInfo is already the user object, use it directly
+        if (userInfo._id) {
+            const userObj = userInfo;
+
+            return {
+                success: true,
+                data: {
+                    id: userObj._id || userObj.id,
+                    name: userObj.name,
+                    email: userObj.email,
+                    role: userObj.role,
+                    status: userObj.status,
+                    phone: userObj.phone,
+                    profileImageUrl: userObj.profileImageUrl,
+                    fhirResourceId: userObj.fhirResourceId,
+                    fhirResourceType: userObj.fhirResourceType,
+                    permissions: userObj.permissions || [],
+                    createdAt: userObj.createdAt,
+                    updatedAt: userObj.updatedAt
+                }
+            };
+        }
+
+        // Otherwise, try to find the user by ID
+        const user = await this.usersService.findById(userInfo.sub);
+        console.log('User found:', user);
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        // Convert user to plain object safely
+        const userObj = user as any;
+
+        return {
+            success: true,
+            data: {
+                id: userObj._id || userObj.id,
+                name: userObj.name,
+                email: userObj.email,
+                role: userObj.role,
+                status: userObj.status,
+                phone: userObj.phone,
+                profileImageUrl: userObj.profileImageUrl,
+                fhirResourceId: userObj.fhirResourceId,
+                fhirResourceType: userObj.fhirResourceType,
+                permissions: userObj.permissions || [],
+                createdAt: userObj.createdAt,
+                updatedAt: userObj.updatedAt
+            }
+        };
     }
 } 

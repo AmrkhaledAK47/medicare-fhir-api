@@ -1,0 +1,1 @@
+{"success":true,"data":{"name":"Test Patient","email":"testpatient@example.com","role":"patient","status":"pending","accessCodeExpires":"2025-07-01T20:12:39.350Z","isEmailVerified":false,"permissions":[],"_id":"6862efb7085211572e4e0f37","createdAt":"2025-06-30T20:12:39.351Z","updatedAt":"2025-06-30T20:12:39.351Z","__v":0}}

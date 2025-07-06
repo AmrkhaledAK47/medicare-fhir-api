@@ -218,9 +218,9 @@ export class ObservationController extends BaseResourceController {
 
     /**
      * Get observations using composite search parameters
-     * Allows searching by component-code and component-value together
+     * Allows searching by component-code and component-value together using standard search
      */
-    @Get('$by-component-value')
+    @Get('search/by-component-value')
     @ApiOperation({ summary: 'Search observations by component code and value' })
     @ApiQuery({ name: 'component-code', required: true, description: 'Component code to search for' })
     @ApiQuery({ name: 'value-operator', required: false, description: 'Value comparison operator (eq, ne, gt, lt, ge, le)', enum: ['eq', 'ne', 'gt', 'lt', 'ge', 'le'] })
@@ -249,22 +249,29 @@ export class ObservationController extends BaseResourceController {
             throw new Error('Invalid value-operator. Must be one of: eq, ne, gt, lt, ge, le');
         }
 
+        this.logger.debug(`Searching observations with component code ${componentCode} and value ${operator}${value}`);
+
+        // Create parameters object with all the search criteria
         const params = {
-            ...query,
-            'component-code-value-quantity': `${componentCode}$${operator}${value}`,
+            'component-code': componentCode,
+            'value-operator': operator,
+            'value': value,
+            ...query
         };
 
-        return this.hapiFhirAdapter.search('Observation', this.transformQueryParams(params));
+        // The adapter will handle the transformation of these parameters
+        // into the correct FHIR search format (component-code-value-quantity)
+        return this.hapiFhirAdapter.search('Observation', params);
     }
 
     /**
-     * Get observations within a specific reference range
+     * Get observations by reference range using standard search
      */
-    @Get('$by-reference-range')
+    @Get('search/by-reference-range')
     @ApiOperation({ summary: 'Search observations by reference range' })
     @ApiQuery({ name: 'code', required: true, description: 'Observation code' })
-    @ApiQuery({ name: 'range-low', required: false, description: 'Low value of reference range' })
-    @ApiQuery({ name: 'range-high', required: false, description: 'High value of reference range' })
+    @ApiQuery({ name: 'range-low', required: false, description: 'Lower bound of reference range' })
+    @ApiQuery({ name: 'range-high', required: false, description: 'Upper bound of reference range' })
     @ApiResponse({ status: 200, description: 'Observations retrieved successfully' })
     @Roles(Role.PRACTITIONER, Role.ADMIN)
     async getObservationsByReferenceRange(
@@ -281,20 +288,18 @@ export class ObservationController extends BaseResourceController {
             throw new Error('At least one of range-low or range-high is required');
         }
 
-        const params = {
-            ...query,
+        // Create direct query parameters - the adapter will transform these
+        const params: Record<string, string> = {
             'code': code,
+            'range-low': rangeLow,
+            'range-high': rangeHigh,
+            ...query
         };
 
-        if (rangeLow) {
-            params['reference-range-low'] = rangeLow;
-        }
+        this.logger.debug(`Searching observations with code ${code} and reference range low=${rangeLow}, high=${rangeHigh}`);
 
-        if (rangeHigh) {
-            params['reference-range-high'] = rangeHigh;
-        }
-
-        return this.hapiFhirAdapter.search('Observation', this.transformQueryParams(params));
+        // Let the adapter handle the parameter transformation and search
+        return this.hapiFhirAdapter.search('Observation', params);
     }
 
     /**
@@ -316,134 +321,5 @@ export class ObservationController extends BaseResourceController {
         // You might want to add additional validation here
 
         return this.hapiFhirAdapter.create('Observation', data);
-    }
-
-    /**
-     * Override transformQueryParams to add observation-specific search parameter handling
-     */
-    protected transformQueryParams(params: any): Record<string, string> {
-        const searchParams = super.transformQueryParams(params);
-
-        // Handle date range searches
-        if (params.date) {
-            searchParams.date = params.date;
-        } else {
-            if (params.date_start) {
-                searchParams['date'] = `ge${params.date_start}`;
-            }
-            if (params.date_end) {
-                if (searchParams['date']) {
-                    searchParams['date'] += `,le${params.date_end}`;
-                } else {
-                    searchParams['date'] = `le${params.date_end}`;
-                }
-            }
-        }
-
-        // Handle value range searches
-        if (params.value_min || params.value_max || params['value-min'] || params['value-max']) {
-            let valueRange = '';
-
-            // Support both formats: value_min and value-min
-            const min = params.value_min || params['value-min'];
-            const max = params.value_max || params['value-max'];
-
-            if (min) {
-                valueRange += `ge${min}`;
-            }
-            if (max) {
-                if (valueRange) {
-                    valueRange += `,le${max}`;
-                } else {
-                    valueRange = `le${max}`;
-                }
-            }
-            if (valueRange) {
-                searchParams['value-quantity'] = valueRange;
-            }
-        }
-
-        // Handle status filter
-        if (params.status && Array.isArray(params.status)) {
-            searchParams.status = params.status.join(',');
-        }
-
-        // Handle component code searches
-        if (params['component-code']) {
-            searchParams['component-code'] = params['component-code'];
-        }
-
-        // Handle component value searches
-        if (params['component-value-quantity']) {
-            searchParams['component-value-quantity'] = params['component-value-quantity'];
-        }
-
-        // Handle composite search parameters (component-code-value-quantity)
-        if (params['component-code-value-quantity']) {
-            searchParams['component-code-value-quantity'] = params['component-code-value-quantity'];
-        }
-
-        // Handle reference range searches
-        if (params['reference-range']) {
-            searchParams['reference-range'] = params['reference-range'];
-        }
-
-        // Handle specific reference range low/high searches
-        if (params['reference-range-low']) {
-            searchParams['reference-range-low'] = params['reference-range-low'];
-        }
-
-        if (params['reference-range-high']) {
-            searchParams['reference-range-high'] = params['reference-range-high'];
-        }
-
-        // Handle data absent reason searches
-        if (params['data-absent-reason']) {
-            searchParams['data-absent-reason'] = params['data-absent-reason'];
-        }
-
-        // Handle derived-from searches (e.g., observations derived from other observations)
-        if (params['derived-from']) {
-            searchParams['derived-from'] = params['derived-from'];
-        }
-
-        // Handle has-member searches (e.g., panel observations)
-        if (params['has-member']) {
-            searchParams['has-member'] = params['has-member'];
-        }
-
-        // Handle chained parameters for patient
-        Object.keys(params).forEach(key => {
-            if (key.startsWith('patient.')) {
-                const chainedParam = key.substring('patient.'.length);
-                searchParams[`subject:Patient.${chainedParam}`] = params[key];
-            }
-        });
-
-        // Handle chained parameters for performer
-        Object.keys(params).forEach(key => {
-            if (key.startsWith('performer.')) {
-                const chainedParam = key.substring('performer.'.length);
-                searchParams[`performer.${chainedParam}`] = params[key];
-            }
-        });
-
-        // Handle combination searches with comma-separated values
-        ['code', 'category', 'identifier'].forEach(param => {
-            if (params[param] && params[param].includes(',')) {
-                // Keep comma-separated values as is for FHIR OR searches
-                searchParams[param] = params[param];
-            }
-        });
-
-        // Handle _has parameter for reverse chaining
-        // Example: _has:Observation:patient:code=1234
-        Object.keys(params).forEach(key => {
-            if (key.startsWith('_has:')) {
-                searchParams[key] = params[key];
-            }
-        });
-
-        return searchParams;
     }
 } 

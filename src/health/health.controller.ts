@@ -1,52 +1,70 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-
-interface HealthStatus {
-    status: string;
-    timestamp: string;
-    uptime: number;
-    environment: string;
-    fhirServer: string;
-    database: string;
-    version: string;
-}
+import { Controller, Get, Inject } from '@nestjs/common';
+import { HealthCheck, HealthCheckService, HttpHealthIndicator, MongooseHealthIndicator } from '@nestjs/terminus';
+import { ConfigService } from '@nestjs/config';
+import { Public } from '../auth/decorators/public.decorator';
+import { FhirService } from '../fhir/fhir.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('health')
 @Controller('health')
 export class HealthController {
-    private startTime: number;
-
-    constructor() {
-        this.startTime = Date.now();
-    }
+    constructor(
+        private health: HealthCheckService,
+        private http: HttpHealthIndicator,
+        private mongo: MongooseHealthIndicator,
+        private configService: ConfigService,
+        private fhirService: FhirService,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    ) { }
 
     @Get()
-    @ApiOperation({ summary: 'Get API health status' })
-    @ApiResponse({
-        status: 200,
-        description: 'The API is healthy',
-        schema: {
-            type: 'object',
-            properties: {
-                status: { type: 'string', example: 'ok' },
-                timestamp: { type: 'string', example: '2023-08-25T12:34:56.789Z' },
-                uptime: { type: 'number', example: 1234567 },
-                environment: { type: 'string', example: 'production' },
-                fhirServer: { type: 'string', example: 'connected' },
-                database: { type: 'string', example: 'connected' },
-                version: { type: 'string', example: '1.0.0' },
+    @Public()
+    @HealthCheck()
+    @ApiOperation({ summary: 'Check system health' })
+    check() {
+        return this.health.check([
+            // Check MongoDB connection
+            () => this.mongo.pingCheck('mongodb'),
+
+            // Check FHIR server
+            async () => {
+                const isHealthy = await this.fhirService.checkHealth();
+                return {
+                    fhir: {
+                        status: isHealthy ? 'up' : 'down',
+                    },
+                };
             },
-        },
-    })
-    getHealth(): HealthStatus {
-        return {
-            status: 'ok',
-            timestamp: new Date().toISOString(),
-            uptime: Date.now() - this.startTime,
-            environment: process.env.NODE_ENV || 'development',
-            fhirServer: process.env.FHIR_SERVER_URL ? 'configured' : 'not configured',
-            database: process.env.MONGODB_URI ? 'configured' : 'not configured',
-            version: process.env.npm_package_version || '1.0.0',
-        };
+
+            // Check Redis connection
+            async () => {
+                try {
+                    // Try to set and get a value from Redis
+                    const testKey = 'health-check-test';
+                    const testValue = Date.now().toString();
+
+                    await this.cacheManager.set(testKey, testValue, 10 * 1000);
+                    const retrievedValue = await this.cacheManager.get(testKey);
+
+                    return {
+                        redis: {
+                            status: retrievedValue === testValue ? 'up' : 'down',
+                        },
+                    };
+                } catch (error) {
+                    return {
+                        redis: {
+                            status: 'down',
+                            message: error.message,
+                        },
+                    };
+                }
+            },
+
+            // API self-check
+            () => ({ api: { status: 'up' } }),
+        ]);
     }
 } 

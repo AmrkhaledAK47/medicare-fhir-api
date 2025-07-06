@@ -7,50 +7,80 @@ import { RegisterDto } from '../auth/dto/register.dto';
 import { EmailService } from '../email/email.service';
 import { FhirService } from '../fhir/fhir.service';
 import { CreateUserWithResourceDto } from './dto/create-user-with-resource.dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
 import * as crypto from 'crypto';
 import { Role } from '../auth/guards/roles.guard';
+import { Logger } from '@nestjs/common';
+import { AccessCodesService } from '../access-codes/access-codes.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
+    private readonly logger = new Logger(UsersService.name);
+
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
         private readonly emailService: EmailService,
-        private readonly fhirService: FhirService
+        private readonly fhirService: FhirService,
+        private readonly accessCodesService: AccessCodesService
     ) { }
 
-    async create(registerDto: RegisterDto): Promise<UserDocument> {
-        const { name, email, password, phone, accessCode } = registerDto;
+    async create(registerDto: RegisterDto, fhirResourceInfo?: { fhirResourceId: string, fhirResourceType: string, role: UserRole }): Promise<UserDocument> {
+        const { email, password, name, phone, accessCode } = registerDto;
 
-        if (registerDto.password !== registerDto.repeatPassword) {
-            throw new ConflictException('Passwords do not match');
+        // Check if user already exists (by email)
+        const existingUser = await this.userModel.findOne({ email });
+
+        // Handle existing user that is pending completion
+        if (existingUser && existingUser.status === UserStatus.PENDING) {
+            // Update the existing user with the provided password and name
+            existingUser.password = password; // Let the pre-save hook handle hashing
+            existingUser.name = name;
+
+            if (phone) {
+                existingUser.phone = phone;
+            }
+
+            // If we have FHIR resource info from an access code, use it
+            if (fhirResourceInfo) {
+                existingUser.fhirResourceId = fhirResourceInfo.fhirResourceId;
+                existingUser.fhirResourceType = fhirResourceInfo.fhirResourceType;
+                existingUser.role = fhirResourceInfo.role;
+            }
+
+            // Mark the user as active
+            existingUser.status = UserStatus.ACTIVE;
+            existingUser.accessCode = null; // Clear the access code
+
+            await existingUser.save();
+            return existingUser;
         }
 
-        // If access code provided, verify it
-        if (accessCode) {
-            const pendingUser = await this.verifyAccessCode(email, accessCode);
+        // Determine the role (first user is admin, else use what's provided)
+        const userCount = await this.countUsers();
+        let role = userCount === 0 ? UserRole.ADMIN : UserRole.PATIENT;
 
-            // Update the existing user with the provided password
-            pendingUser.password = password;
-            pendingUser.status = UserStatus.ACTIVE;
-            pendingUser.isEmailVerified = true;
-            if (phone) pendingUser.phone = phone;
-
-            await pendingUser.save();
-            return pendingUser;
+        // If we have FHIR resource info from the access code, use that role
+        if (fhirResourceInfo) {
+            role = fhirResourceInfo.role;
         }
 
-        // Direct registration without access code (for admin users or if allowed)
-        const newUser = new this.userModel({
-            name,
+        // Create the new user
+        const user = new this.userModel({
             email,
-            password,
-            role: UserRole.ADMIN, // Only admins can register directly
+            password, // Let the pre-save hook handle hashing
+            name,
+            phone,
+            role,
             status: UserStatus.ACTIVE,
-            isEmailVerified: true,
-            phone
+            // Set FHIR resource info if we have it
+            ...(fhirResourceInfo && {
+                fhirResourceId: fhirResourceInfo.fhirResourceId,
+                fhirResourceType: fhirResourceInfo.fhirResourceType
+            })
         });
 
-        return newUser.save();
+        return user.save();
     }
 
     // Method for admins to create user profiles
@@ -249,10 +279,52 @@ export class UsersService {
         // The file path based on our static file serving configuration
         const avatarUrl = `/uploads/${file.filename}`;
 
-        // Update the user's profile image URL
+        // Update the user's profile image URL in MongoDB
         await this.userModel.findByIdAndUpdate(userId, {
             profileImageUrl: avatarUrl
         });
+
+        // If the user has a FHIR resource, update it with the photo
+        if (user.fhirResourceId && user.fhirResourceType) {
+            try {
+                // Get the current FHIR resource
+                const resource = await this.fhirService.getResource(
+                    user.fhirResourceType,
+                    user.fhirResourceId
+                );
+
+                // Add or update the photo property
+                if (!resource.photo) {
+                    resource.photo = [];
+                }
+
+                // Create a photo entry with the URL
+                const photoEntry = {
+                    contentType: file.mimetype,
+                    url: `${process.env.APP_EXTERNAL_URL || 'http://localhost:3000/api'}${avatarUrl}`,
+                    title: `Profile photo for ${user.name}`
+                };
+
+                // Replace existing photo or add new one
+                if (resource.photo.length > 0) {
+                    resource.photo[0] = photoEntry;
+                } else {
+                    resource.photo.push(photoEntry);
+                }
+
+                // Update the FHIR resource
+                await this.fhirService.updateResource(
+                    user.fhirResourceType,
+                    user.fhirResourceId,
+                    resource
+                );
+
+                this.logger.log(`Updated FHIR resource ${user.fhirResourceType}/${user.fhirResourceId} with new photo`);
+            } catch (error) {
+                // Log error but don't fail the request
+                this.logger.error(`Failed to update FHIR resource with photo: ${error.message}`);
+            }
+        }
 
         return {
             message: 'Avatar updated successfully',
@@ -300,5 +372,69 @@ export class UsersService {
         }
 
         return profile;
+    }
+
+    /**
+     * Create a patient with FHIR resource and send access code in one step
+     * 
+     * @param patientData The patient data to create
+     * @param email The email to send the access code to
+     * @returns The created patient resource and access code
+     */
+    async createPatientWithAccessCode(patientData: any, email: string): Promise<any> {
+        this.logger.log(`Creating patient with access code for email: ${email}`);
+
+        try {
+            // 1. Create the FHIR patient resource
+            const patientResource = await this.fhirService.createFhirResource('Patient', patientData);
+
+            // 2. Generate an access code
+            const accessCode = await this.accessCodesService.create({
+                role: 'patient',
+                recipientEmail: email,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+            });
+
+            // 3. Store the relationship between the access code and the patient resource
+            // This could be stored in a separate collection or as metadata on the patient
+
+            this.logger.log(`Successfully created patient resource with ID ${patientResource.id} and sent access code to ${email}`);
+
+            return {
+                success: true,
+                data: {
+                    patient: patientResource,
+                    accessCode: accessCode.code
+                }
+            };
+        } catch (error) {
+            this.logger.error(`Failed to create patient with access code: ${error.message}`);
+            throw error;
+        }
+    }
+
+    // Create an admin user directly (only callable by existing admins)
+    async createAdminUser(createAdminDto: CreateAdminDto): Promise<User> {
+        const { email, password, name } = createAdminDto;
+
+        // Check if user already exists
+        const existingUser = await this.userModel.findOne({ email });
+        if (existingUser) {
+            throw new ConflictException('User with this email already exists');
+        }
+
+        // Create a new admin user with active status
+        const adminUser = new this.userModel({
+            email,
+            password, // Password will be hashed by the pre-save hook
+            name,
+            role: UserRole.ADMIN,
+            status: UserStatus.ACTIVE,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        });
+
+        this.logger.log(`Creating new admin user with email: ${email}`);
+        return adminUser.save();
     }
 } 

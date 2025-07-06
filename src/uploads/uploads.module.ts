@@ -1,43 +1,35 @@
-import { Module, Global } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { existsSync, mkdirSync } from 'fs';
 import { extname } from 'path';
+import { UploadsController } from './uploads.controller';
+import { UploadsService } from './uploads.service';
+import { v4 as uuidv4 } from 'uuid';
 
-const storageDirectory = './uploads';
-
-// Create uploads directory if it doesn't exist
-if (!existsSync(storageDirectory)) {
-    mkdirSync(storageDirectory, { recursive: true });
-}
-
-@Global()
 @Module({
     imports: [
         MulterModule.register({
             storage: diskStorage({
-                destination: (req, file, cb) => {
-                    cb(null, storageDirectory);
-                },
-                filename: (req, file, cb) => {
-                    // Generate a unique filename with original extension
-                    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+                destination: './uploads',
+                filename: (req, file, callback) => {
+                    const uniqueSuffix = uuidv4();
                     const ext = extname(file.originalname);
-                    cb(null, `${uniqueSuffix}${ext}`);
+                    callback(null, `${uniqueSuffix}${ext}`);
                 },
             }),
-            fileFilter: (req, file, cb) => {
-                // Accept only image files
+            fileFilter: (req, file, callback) => {
                 if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-                    return cb(new Error('Only image files are allowed!'), false);
+                    return callback(new Error('Only image files are allowed!'), false);
                 }
-                cb(null, true);
+                callback(null, true);
             },
             limits: {
-                fileSize: 5 * 1024 * 1024, // 5MB max file size
+                fileSize: 1024 * 1024 * 5, // 5MB
             },
         }),
     ],
-    exports: [MulterModule],
+    controllers: [UploadsController],
+    providers: [UploadsService],
+    exports: [UploadsService],
 })
 export class UploadsModule { } 

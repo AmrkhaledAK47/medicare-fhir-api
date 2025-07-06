@@ -1,0 +1,193 @@
+{
+    "resourceType": "Bundle",
+    "type": "transaction",
+    "entry": [
+        {
+            "resource": {
+                "resourceType": "CarePlan",
+                "id": "careplan-1",
+                "status": "active",
+                "intent": "plan",
+                "title": "Diabetes Management Plan",
+                "subject": {
+                    "reference": "Patient/422",
+                    "display": "John Smith"
+                },
+                "period": {
+                    "start": "2025-07-01",
+                    "end": "2025-12-31"
+                },
+                "activity": [
+                    {
+                        "detail": {
+                            "status": "scheduled",
+                            "description": "Check blood glucose levels",
+                            "scheduledTiming": {
+                                "repeat": {
+                                    "frequency": 1,
+                                    "period": 1,
+                                    "periodUnit": "d"
+                                },
+                                "event": [
+                                    "2025-07-10T08:00:00Z"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "detail": {
+                            "status": "scheduled",
+                            "description": "30-minute walk",
+                            "scheduledTiming": {
+                                "repeat": {
+                                    "frequency": 1,
+                                    "period": 1,
+                                    "periodUnit": "d"
+                                },
+                                "event": [
+                                    "2025-07-12T17:30:00Z"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "request": {
+                "method": "PUT",
+                "url": "CarePlan/careplan-1"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "CarePlan",
+                "id": "careplan-2",
+                "status": "active",
+                "intent": "plan",
+                "title": "Hypertension Management Plan",
+                "subject": {
+                    "reference": "Patient/422",
+                    "display": "John Smith"
+                },
+                "period": {
+                    "start": "2025-07-01",
+                    "end": "2025-12-31"
+                },
+                "activity": [
+                    {
+                        "detail": {
+                            "status": "scheduled",
+                            "description": "Blood pressure monitoring",
+                            "scheduledTiming": {
+                                "repeat": {
+                                    "frequency": 1,
+                                    "period": 3,
+                                    "periodUnit": "d"
+                                },
+                                "event": [
+                                    "2025-07-18T09:00:00Z"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "request": {
+                "method": "PUT",
+                "url": "CarePlan/careplan-2"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "ServiceRequest",
+                "id": "servicerequest-1",
+                "status": "active",
+                "intent": "order",
+                "subject": {
+                    "reference": "Patient/422",
+                    "display": "John Smith"
+                },
+                "requester": {
+                    "reference": "Practitioner/practitioner-1",
+                    "display": "Dr. Sarah Johnson"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "16254007",
+                            "display": "Complete blood count"
+                        }
+                    ],
+                    "text": "Complete Blood Count (CBC)"
+                },
+                "occurrenceDateTime": "2025-07-25T10:30:00Z"
+            },
+            "request": {
+                "method": "PUT",
+                "url": "ServiceRequest/servicerequest-1"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "ServiceRequest",
+                "id": "servicerequest-2",
+                "status": "active",
+                "intent": "order",
+                "subject": {
+                    "reference": "Patient/422",
+                    "display": "John Smith"
+                },
+                "requester": {
+                    "reference": "Practitioner/practitioner-1",
+                    "display": "Dr. Sarah Johnson"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "24028007",
+                            "display": "Radiography"
+                        }
+                    ],
+                    "text": "Chest X-Ray"
+                },
+                "occurrenceDateTime": "2025-07-28T14:15:00Z"
+            },
+            "request": {
+                "method": "PUT",
+                "url": "ServiceRequest/servicerequest-2"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "ServiceRequest",
+                "id": "servicerequest-3",
+                "status": "active",
+                "intent": "order",
+                "subject": {
+                    "reference": "Patient/422",
+                    "display": "John Smith"
+                },
+                "requester": {
+                    "reference": "Practitioner/practitioner-1",
+                    "display": "Dr. Sarah Johnson"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "76601001",
+                            "display": "Intramuscular injection"
+                        }
+                    ],
+                    "text": "Flu Vaccination"
+                },
+                "occurrenceDateTime": "2025-07-05T11:00:00Z"
+            },
+            "request": {
+                "method": "PUT",
+                "url": "ServiceRequest/servicerequest-3"
+            }
+        }
+    ]
+}

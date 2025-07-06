@@ -1,0 +1,1 @@
+{"success":true,"data":{"patientId":"422","scanImagePath":"/brain-scans/1751749406951-thumb.jpg","thumbnailPath":"/brain-scans/thumbnails/thumb-1751749406951-thumb.jpg","status":"pending","tumorDetected":false,"_id":"6869931f6ad0e9ad3c870e69","tumorBoundingBox":[],"createdAt":"2025-07-05T21:03:27.005Z","updatedAt":"2025-07-05T21:03:27.005Z","__v":0}}

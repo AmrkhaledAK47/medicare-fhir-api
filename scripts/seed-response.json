@@ -1,0 +1,282 @@
+{
+  "resourceType": "Bundle",
+  "id": "d7186048-ed10-493a-9a2c-1fd681d3d71c",
+  "type": "transaction-response",
+  "link": [
+    {
+      "relation": "self",
+      "url": "http://localhost:9090/fhir"
+    }
+  ],
+  "entry": [
+    {
+      "response": {
+        "status": "201 Created",
+        "location": "Patient/patient-1/_history/1",
+        "etag": "1",
+        "lastModified": "2025-07-05T16:27:06.264+00:00",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://hapifhir.io/fhir/CodeSystem/hapi-fhir-storage-response-code",
+                    "code": "SUCCESSFUL_UPDATE_AS_CREATE",
+                    "display": "Update as create succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully created resource \"Patient/patient-1/_history/1\" using update as create (ie. create with client assigned ID). Took 196ms."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "response": {
+        "status": "201 Created",
+        "location": "Patient/patient-2/_history/1",
+        "etag": "1",
+        "lastModified": "2025-07-05T16:27:06.264+00:00",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://hapifhir.io/fhir/CodeSystem/hapi-fhir-storage-response-code",
+                    "code": "SUCCESSFUL_UPDATE_AS_CREATE",
+                    "display": "Update as create succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully created resource \"Patient/patient-2/_history/1\" using update as create (ie. create with client assigned ID). Took 4ms."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "response": {
+        "status": "200 OK",
+        "location": "Practitioner/practitioner-1/_history/2",
+        "etag": "2",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://hapifhir.io/fhir/CodeSystem/hapi-fhir-storage-response-code",
+                    "code": "SUCCESSFUL_UPDATE",
+                    "display": "Update succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully updated resource \"Practitioner/practitioner-1/_history/2\"."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "response": {
+        "status": "201 Created",
+        "location": "Practitioner/practitioner-2/_history/1",
+        "etag": "1",
+        "lastModified": "2025-07-05T16:27:06.264+00:00",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://hapifhir.io/fhir/CodeSystem/hapi-fhir-storage-response-code",
+                    "code": "SUCCESSFUL_UPDATE_AS_CREATE",
+                    "display": "Update as create succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully created resource \"Practitioner/practitioner-2/_history/1\" using update as create (ie. create with client assigned ID). Took 7ms."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "response": {
+        "status": "201 Created",
+        "location": "Organization/organization-1/_history/1",
+        "etag": "1",
+        "lastModified": "2025-07-05T16:27:06.264+00:00",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://hapifhir.io/fhir/CodeSystem/hapi-fhir-storage-response-code",
+                    "code": "SUCCESSFUL_UPDATE_AS_CREATE",
+                    "display": "Update as create succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully created resource \"Organization/organization-1/_history/1\" using update as create (ie. create with client assigned ID). Took 9ms."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "response": {
+        "status": "201 Created",
+        "location": "Encounter/encounter-1/_history/1",
+        "etag": "1",
+        "lastModified": "2025-07-05T16:27:06.264+00:00",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://hapifhir.io/fhir/CodeSystem/hapi-fhir-storage-response-code",
+                    "code": "SUCCESSFUL_UPDATE_AS_CREATE",
+                    "display": "Update as create succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully created resource \"Encounter/encounter-1/_history/1\" using update as create (ie. create with client assigned ID). Took 23ms."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "response": {
+        "status": "201 Created",
+        "location": "Observation/observation-1/_history/1",
+        "etag": "1",
+        "lastModified": "2025-07-05T16:27:06.264+00:00",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://hapifhir.io/fhir/CodeSystem/hapi-fhir-storage-response-code",
+                    "code": "SUCCESSFUL_UPDATE_AS_CREATE",
+                    "display": "Update as create succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully created resource \"Observation/observation-1/_history/1\" using update as create (ie. create with client assigned ID). Took 20ms."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "response": {
+        "status": "201 Created",
+        "location": "Observation/observation-2/_history/1",
+        "etag": "1",
+        "lastModified": "2025-07-05T16:27:06.264+00:00",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://hapifhir.io/fhir/CodeSystem/hapi-fhir-storage-response-code",
+                    "code": "SUCCESSFUL_UPDATE_AS_CREATE",
+                    "display": "Update as create succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully created resource \"Observation/observation-2/_history/1\" using update as create (ie. create with client assigned ID). Took 8ms."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "response": {
+        "status": "201 Created",
+        "location": "DiagnosticReport/diagnostic-report-1/_history/1",
+        "etag": "1",
+        "lastModified": "2025-07-05T16:27:06.264+00:00",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://hapifhir.io/fhir/CodeSystem/hapi-fhir-storage-response-code",
+                    "code": "SUCCESSFUL_UPDATE_AS_CREATE",
+                    "display": "Update as create succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully created resource \"DiagnosticReport/diagnostic-report-1/_history/1\" using update as create (ie. create with client assigned ID). Took 10ms."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "response": {
+        "status": "201 Created",
+        "location": "Questionnaire/questionnaire-1/_history/1",
+        "etag": "1",
+        "lastModified": "2025-07-05T16:27:06.264+00:00",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://hapifhir.io/fhir/CodeSystem/hapi-fhir-storage-response-code",
+                    "code": "SUCCESSFUL_UPDATE_AS_CREATE",
+                    "display": "Update as create succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully created resource \"Questionnaire/questionnaire-1/_history/1\" using update as create (ie. create with client assigned ID). Took 8ms."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

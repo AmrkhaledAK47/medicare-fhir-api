@@ -1,0 +1,128 @@
+[
+  {
+    "resourceType": "Practitioner",
+    "id": "pract-3885",
+    "active": true,
+    "name": [
+      {
+        "use": "official",
+        "family": "Johnson",
+        "given": [
+          "Robert"
+        ],
+        "prefix": [
+          "Dr."
+        ]
+      }
+    ],
+    "gender": "male",
+    "qualification": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+              "code": "MD",
+              "display": "Doctor of Medicine"
+            }
+          ]
+        }
+      }
+    ],
+    "specialty": [
+      {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "cardio",
+            "display": "Cardiology"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Practitioner",
+    "id": "pract-9477",
+    "active": true,
+    "name": [
+      {
+        "use": "official",
+        "family": "Smith",
+        "given": [
+          "Jennifer"
+        ],
+        "prefix": [
+          "Dr."
+        ]
+      }
+    ],
+    "gender": "female",
+    "qualification": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+              "code": "MD",
+              "display": "Doctor of Medicine"
+            }
+          ]
+        }
+      }
+    ],
+    "specialty": [
+      {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "neuro",
+            "display": "Neurology"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Practitioner",
+    "id": "pract-7501",
+    "active": true,
+    "name": [
+      {
+        "use": "official",
+        "family": "Davis",
+        "given": [
+          "Elizabeth"
+        ],
+        "prefix": [
+          "Dr."
+        ]
+      }
+    ],
+    "gender": "female",
+    "qualification": [
+      {
+        "code": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+              "code": "MD",
+              "display": "Doctor of Medicine"
+            }
+          ]
+        }
+      }
+    ],
+    "specialty": [
+      {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "gp",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  }
+]

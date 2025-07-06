@@ -4,6 +4,7 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
+import { AccessCodesModule } from '../access-codes/access-codes.module';
 
 // Import schemas
 import { Patient, PatientSchema } from './schemas/patient.schema';
@@ -26,6 +27,7 @@ import { TerminologyAdapter } from './adapters/terminology.adapter';
 // Import interceptors
 import { FhirValidationInterceptor } from './interceptors/fhir-validation.interceptor';
 import { AuditTrailInterceptor } from './interceptors/audit-trail.interceptor';
+import { UrlRewriteInterceptor } from './interceptors/url-rewrite.interceptor';
 
 // Import filters
 import { FhirExceptionFilter } from './filters/fhir-exception.filter';
@@ -43,6 +45,7 @@ import { DiagnosticReportService } from './services/diagnostic-report.service';
 import { MedicationService } from './services/medication.service';
 import { QuestionnaireService } from './services/questionnaire.service';
 import { PaymentService } from './services/payment.service';
+import { AuditEventService } from './services/audit-event.service';
 
 // Import controllers
 import { FhirController } from './fhir.controller';
@@ -63,12 +66,16 @@ import { ValidationController } from './controllers/validation.controller';
 import { DocumentationController } from './controllers/documentation.controller';
 import { ExamplePaginationController } from './controllers/example-pagination.controller';
 import { AllergyIntoleranceController } from './controllers/allergy-intolerance.controller';
+import { FhirQueryGuideController } from './controllers/fhir-query-guide.controller';
+import { AuditEventController } from './controllers/audit-event.controller';
 
 // Import middleware
 import { FhirAuthorizationMiddleware } from './middleware/fhir-authorization.middleware';
 import { FhirVersioningMiddleware } from './middleware/fhir-versioning.middleware';
+import { IdFormatMiddleware } from './middleware/id-format.middleware';
 import { FhirConfigService } from './config/fhir-config.service';
 import { FhirConfig } from './config/fhir-config.interface';
+import { EnhancedAuthorizationMiddleware } from './middleware/enhanced-authorization.middleware';
 
 @Global()
 @Module({})
@@ -82,7 +89,7 @@ export class FhirModule implements OnModuleInit {
 
     configure(consumer: MiddlewareConsumer) {
         consumer
-            .apply(FhirVersioningMiddleware, FhirAuthorizationMiddleware)
+            .apply(FhirVersioningMiddleware, IdFormatMiddleware, EnhancedAuthorizationMiddleware, FhirAuthorizationMiddleware)
             .forRoutes({ path: 'fhir/*', method: RequestMethod.ALL });
     }
 
@@ -105,9 +112,21 @@ export class FhirModule implements OnModuleInit {
         const imports = [
             MongooseModule.forFeature(schemaImports),
             ConfigModule,
-            HttpModule.register({
-                timeout: 5000,
-                maxRedirects: 5,
+            HttpModule.registerAsync({
+                imports: [ConfigModule],
+                useFactory: async (configService: ConfigService) => ({
+                    baseURL: configService.get<string>('FHIR_BASE_URL'),
+                    auth: {
+                        username: configService.get<string>('FHIR_USERNAME'),
+                        password: configService.get<string>('FHIR_PASSWORD'),
+                    },
+                    timeout: 10000,
+                    headers: {
+                        'Content-Type': 'application/fhir+json',
+                        'Accept': 'application/fhir+json',
+                    },
+                }),
+                inject: [ConfigService],
             }),
             JwtModule.registerAsync({
                 imports: [ConfigModule],
@@ -119,6 +138,7 @@ export class FhirModule implements OnModuleInit {
                     },
                 }),
             }),
+            AccessCodesModule,
         ];
 
         // Setup providers
@@ -145,6 +165,9 @@ export class FhirModule implements OnModuleInit {
             PaymentService,
             FhirAuthorizationMiddleware,
             FhirVersioningMiddleware,
+            IdFormatMiddleware,
+            EnhancedAuthorizationMiddleware,
+            AuditEventService,
             // Global exception filter
             {
                 provide: APP_FILTER,
@@ -161,13 +184,18 @@ export class FhirModule implements OnModuleInit {
             });
         }
 
-        if (options.enableAuditing !== false) {
-            providers.push(AuditTrailInterceptor);
-            providers.push({
-                provide: APP_INTERCEPTOR,
-                useClass: AuditTrailInterceptor,
-            });
-        }
+        // Always enable audit trail interceptor
+        providers.push({
+            provide: APP_INTERCEPTOR,
+            useClass: AuditTrailInterceptor,
+        });
+
+        // Always enable URL rewriting
+        providers.push(UrlRewriteInterceptor);
+        providers.push({
+            provide: APP_INTERCEPTOR,
+            useClass: UrlRewriteInterceptor,
+        });
 
         const controllers = [
             FhirController,
@@ -189,6 +217,8 @@ export class FhirModule implements OnModuleInit {
             DocumentationController,
             ExamplePaginationController,
             AllergyIntoleranceController,
+            FhirQueryGuideController,
+            AuditEventController,
         ];
 
         const exports = [
@@ -206,16 +236,12 @@ export class FhirModule implements OnModuleInit {
             MedicationService,
             QuestionnaireService,
             PaymentService,
+            AuditEventService,
         ];
 
         if (options.enableValidation !== false) {
             // Don't add to exports, interceptors are only providers
             // exports.push(FhirValidationInterceptor);
-        }
-
-        if (options.enableAuditing !== false) {
-            // Don't add to exports, interceptors are only providers
-            // exports.push(AuditTrailInterceptor);
         }
 
         return {

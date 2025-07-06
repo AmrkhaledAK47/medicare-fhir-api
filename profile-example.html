@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare Profile Example</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f7fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        .login-container, .profile-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .profile-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .avatar-container {
+            position: relative;
+            margin-right: 20px;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4e73df;
+        }
+        .avatar-upload {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #4e73df;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+        }
+        .profile-info {
+            flex: 1;
+        }
+        .profile-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .profile-role {
+            color: #6c757d;
+            margin: 5px 0;
+        }
+        .profile-detail {
+            margin-top: 20px;
+            width: 100%;
+        }
+        .detail-section {
+            margin-bottom: 20px;
+        }
+        .detail-section h3 {
+            border-bottom: 1px solid #e1e4e8;
+            padding-bottom: 10px;
+            color: #2c3e50;
+        }
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .detail-label {
+            width: 150px;
+            font-weight: bold;
+            color: #6c757d;
+        }
+        .detail-value {
+            flex: 1;
+        }
+        .disease-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .disease-item {
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            border-left: 3px solid #4e73df;
+        }
+        .disease-none {
+            color: #6c757d;
+            font-style: italic;
+        }
+        button {
+            background-color: #4e73df;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2e59d9;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            font-style: italic;
+            color: #6c757d;
+        }
+        .hidden {
+            display: none;
+        }
+        .logout-button {
+            background-color: #e74a3b;
+        }
+        #avatar-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MediCare Profile Example</h1>
+            <div id="user-info" class="hidden">
+                <button id="logout-btn" class="logout-button">Logout</button>
+            </div>
+        </div>
+        
+        <div id="login-container" class="login-container">
+            <h2>Login</h2>
+            <div id="login-error" class="error hidden"></div>
+            <form id="login-form">
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="patient@example.com" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" value="Patient123!" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+        
+        <div id="profile-container" class="profile-container hidden">
+            <div id="profile-error" class="error hidden"></div>
+            <div id="profile-loading" class="loading">Loading profile data...</div>
+            
+            <div id="profile-content" class="hidden">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="avatar-container">
+                            <img id="profile-avatar" class="avatar" src="" alt="Profile Avatar">
+                            <label for="avatar-input" class="avatar-upload">
+                                <span>+</span>
+                            </label>
+                            <input type="file" id="avatar-input" accept="image/*">
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="profile-name" class="profile-name"></h2>
+                            <p id="profile-role" class="profile-role"></p>
+                            <p id="profile-email"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-detail">
+                        <div class="detail-section">
+                            <h3>Personal Information</h3>
+                            <div class="detail-row">
+                                <div class="detail-label">Name</div>
+                                <div id="detail-name" class="detail-value"></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Date of Birth</div>
+                                <div id="detail-dob" class="detail-value"></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Age</div>
+                                <div id="detail-age" class="detail-value"></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Phone Number</div>
+                                <div id="detail-phone" class="detail-value"></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Email Address</div>
+                                <div id="detail-email" class="detail-value"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3>Diseases</h3>
+                            <div class="detail-row">
+                                <div class="detail-label">Speech</div>
+                                <div id="diseases-speech" class="detail-value">
+                                    <ul class="disease-list" id="speech-list"></ul>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Physical</div>
+                                <div id="diseases-physical" class="detail-value">
+                                    <ul class="disease-list" id="physical-list"></ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3>General</h3>
+                            <div class="detail-row">
+                                <div class="detail-label">Change Password</div>
+                                <div class="detail-value">
+                                    <button id="change-password-btn">Change</button>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Notifications</div>
+                                <div class="detail-value">
+                                    <label class="switch">
+                                        <input type="checkbox" id="notifications-toggle">
+                                        <span class="slider round"></span>
+                                        Enable Notifications
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // API Configuration
+        const API_URL = 'http://localhost:3000/api';
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+        
+        // DOM Elements
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const loginContainer = document.getElementById('login-container');
+        const profileContainer = document.getElementById('profile-container');
+        const profileError = document.getElementById('profile-error');
+        const profileLoading = document.getElementById('profile-loading');
+        const profileContent = document.getElementById('profile-content');
+        const userInfo = document.getElementById('user-info');
+        const logoutBtn = document.getElementById('logout-btn');
+        const avatarInput = document.getElementById('avatar-input');
+        
+        // Check if user is already logged in
+        if (authToken) {
+            showProfile();
+        }
+        
+        // Event Listeners
+        loginForm.addEventListener('submit', handleLogin);
+        logoutBtn.addEventListener('click', handleLogout);
+        avatarInput.addEventListener('change', handleAvatarUpload);
+        
+        // Login Handler
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data.accessToken) {
+                    authToken = data.data.accessToken;
+                    currentUser = data.data.user;
+                    localStorage.setItem('authToken', authToken);
+                    showProfile();
+                } else {
+                    showLoginError(data.message || 'Login failed. Please check your credentials.');
+                }
+            } catch (error) {
+                showLoginError('An error occurred during login. Please try again.');
+                console.error('Login error:', error);
+            }
+        }
+        
+        // Logout Handler
+        function handleLogout() {
+            localStorage.removeItem('authToken');
+            authToken = null;
+            currentUser = null;
+            showLogin();
+        }
+        
+        // Avatar Upload Handler
+        async function handleAvatarUpload(event) {
+            if (!event.target.files || !event.target.files[0]) return;
+            
+            const file = event.target.files[0];
+            const formData = new FormData();
+            formData.append('avatar', file);
+            
+            try {
+                const response = await fetch(`${API_URL}/users/${currentUser.id}/avatar`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update avatar in UI
+                    document.getElementById('profile-avatar').src = data.data.avatarUrl;
+                    
+                    // Refresh profile data to get updated FHIR resource
+                    fetchProfileData();
+                } else {
+                    showProfileError('Failed to update avatar');
+                }
+            } catch (error) {
+                showProfileError('An error occurred while uploading avatar');
+                console.error('Avatar upload error:', error);
+            }
+        }
+        
+        // Show Login Form
+        function showLogin() {
+            loginContainer.classList.remove('hidden');
+            profileContainer.classList.add('hidden');
+            userInfo.classList.add('hidden');
+            loginError.classList.add('hidden');
+        }
+        
+        // Show Profile
+        function showProfile() {
+            loginContainer.classList.add('hidden');
+            profileContainer.classList.remove('hidden');
+            userInfo.classList.remove('hidden');
+            fetchProfileData();
+        }
+        
+        // Show Login Error
+        function showLoginError(message) {
+            loginError.textContent = message;
+            loginError.classList.remove('hidden');
+        }
+        
+        // Show Profile Error
+        function showProfileError(message) {
+            profileError.textContent = message;
+            profileError.classList.remove('hidden');
+        }
+        
+        // Fetch Profile Data
+        async function fetchProfileData() {
+            if (!authToken) {
+                showLogin();
+                return;
+            }
+            
+            // Show loading state
+            profileContent.classList.add('hidden');
+            profileError.classList.add('hidden');
+            profileLoading.classList.remove('hidden');
+            
+            try {
+                const response = await fetch(`${API_URL}/dashboard`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.status === 401) {
+                    // Token expired or invalid
+                    handleLogout();
+                    showLoginError('Your session has expired. Please log in again.');
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderProfile(data.data);
+                } else {
+                    showProfileError('Failed to load profile data');
+                }
+            } catch (error) {
+                showProfileError('An error occurred while fetching profile data');
+                console.error('Profile error:', error);
+            } finally {
+                profileLoading.classList.add('hidden');
+            }
+        }
+        
+        // Render Profile
+        function renderProfile(data) {
+            const profile = data.profile;
+            if (!profile) {
+                showProfileError('Profile information not available');
+                return;
+            }
+            
+            // Update current user
+            currentUser = {
+                id: profile.id,
+                name: profile.name,
+                email: profile.email,
+                role: profile.role
+            };
+            
+            // Basic profile info
+            document.getElementById('profile-name').textContent = profile.name;
+            document.getElementById('profile-role').textContent = profile.role.charAt(0).toUpperCase() + profile.role.slice(1);
+            document.getElementById('profile-email').textContent = profile.email;
+            
+            // Avatar
+            const avatarElement = document.getElementById('profile-avatar');
+            if (profile.profileImageUrl) {
+                avatarElement.src = profile.profileImageUrl;
+            } else {
+                // Use first letter of name as fallback
+                const firstLetter = profile.name.charAt(0).toUpperCase();
+                avatarElement.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%234e73df"/><text x="50" y="50" font-family="Arial" font-size="50" fill="white" text-anchor="middle" dominant-baseline="central">${firstLetter}</text></svg>`;
+            }
+            
+            // Personal information
+            document.getElementById('detail-name').textContent = profile.name;
+            document.getElementById('detail-email').textContent = profile.email;
+            document.getElementById('detail-phone').textContent = profile.phone || 'Not provided';
+            
+            // FHIR details if available
+            if (profile.fhirDetails && profile.fhirDetails.details) {
+                const details = profile.fhirDetails.details;
+                document.getElementById('detail-dob').textContent = details.birthDate || 'Not provided';
+                
+                // Calculate age if birthDate is available
+                if (details.birthDate) {
+                    const birthDate = new Date(details.birthDate);
+                    const today = new Date();
+                    let age = today.getFullYear() - birthDate.getFullYear();
+                    const monthDiff = today.getMonth() - birthDate.getMonth();
+                    
+                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                    
+                    document.getElementById('detail-age').textContent = age;
+                } else {
+                    document.getElementById('detail-age').textContent = 'Not available';
+                }
+            } else {
+                document.getElementById('detail-dob').textContent = 'Not available';
+                document.getElementById('detail-age').textContent = 'Not available';
+            }
+            
+            // Diseases
+            renderDiseases(profile.diseases);
+            
+            // Show profile content
+            profileContent.classList.remove('hidden');
+        }
+        
+        // Render Diseases
+        function renderDiseases(diseases) {
+            const speechList = document.getElementById('speech-list');
+            const physicalList = document.getElementById('physical-list');
+            
+            speechList.innerHTML = '';
+            physicalList.innerHTML = '';
+            
+            if (!diseases) {
+                speechList.innerHTML = '<div class="disease-none">None</div>';
+                physicalList.innerHTML = '<div class="disease-none">None</div>';
+                return;
+            }
+            
+            // Speech diseases
+            if (diseases.speech && diseases.speech.length > 0) {
+                diseases.speech.forEach(disease => {
+                    const li = document.createElement('li');
+                    li.className = 'disease-item';
+                    li.textContent = disease;
+                    speechList.appendChild(li);
+                });
+            } else {
+                speechList.innerHTML = '<div class="disease-none">None</div>';
+            }
+            
+            // Physical diseases
+            if (diseases.physical && diseases.physical.length > 0) {
+                diseases.physical.forEach(disease => {
+                    const li = document.createElement('li');
+                    li.className = 'disease-item';
+                    li.textContent = disease;
+                    physicalList.appendChild(li);
+                });
+            } else {
+                physicalList.innerHTML = '<div class="disease-none">None</div>';
+            }
+        }
+    </script>
+</body>
+</html> 

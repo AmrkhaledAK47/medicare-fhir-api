@@ -1,0 +1,1 @@
+{"resourceType":"OperationOutcome","issue":[{"severity":"error","code":"exception","diagnostics":"FHIR server error: [error] HAPI-2001: Resource Patient/res-153 is not known","details":{"text":"FHIR server error: [error] HAPI-2001: Resource Patient/res-153 is not known"}}]}

@@ -7,6 +7,7 @@ import { EmailModule } from '../email/email.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FhirModule } from '../fhir/fhir.module';
+import { AccessCodesModule } from '../access-codes/access-codes.module';
 
 @Module({
     imports: [
@@ -15,6 +16,7 @@ import { FhirModule } from '../fhir/fhir.module';
         ]),
         EmailModule,
         FhirModule,
+        AccessCodesModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],

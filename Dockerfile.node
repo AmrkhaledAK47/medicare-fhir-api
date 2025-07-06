@@ -1,15 +1,24 @@
-FROM node:18
+FROM node:18-alpine
 
 WORKDIR /app
 
+# Install dependencies for sharp image processing
+RUN apk add --no-cache python3 make g++ vips-dev
+
+# Copy package files
 COPY package*.json ./
 
-RUN npm install --legacy-peer-deps
+# Install dependencies
+RUN npm install
 
+# Copy source code
 COPY . .
 
+# Build the application
 RUN npm run build
 
+# Expose the port
 EXPOSE 3000
 
+# Start the application
 CMD ["npm", "run", "start:prod"] 

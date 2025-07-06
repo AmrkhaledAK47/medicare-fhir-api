@@ -1,11 +1,12 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { VerifyAccessCodeDto } from './dto/verify-access-code.dto';
 import { PasswordResetRequestDto, PasswordResetConfirmDto } from './dto/password-reset.dto';
 import { Public } from './decorators/public.decorator';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -104,5 +105,21 @@ export class AuthController {
             passwordResetConfirmDto.resetCode,
             passwordResetConfirmDto.newPassword
         );
+    }
+
+    @Get('me')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Get current user profile' })
+    @ApiResponse({
+        status: 200,
+        description: 'User profile retrieved successfully'
+    })
+    @ApiResponse({
+        status: 401,
+        description: 'Unauthorized'
+    })
+    async getProfile(@Req() req) {
+        return this.authService.getUserProfile(req.user);
     }
 } 

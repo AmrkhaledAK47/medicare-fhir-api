@@ -65,8 +65,10 @@ export class RolesGuard implements CanActivate {
         // Get user's role from token
         const userRole = payload.role;
 
-        // Check if user has required role
-        const hasRequiredRole = requiredRoles.some(role => role === userRole);
+        // Check if user has required role (case-insensitive)
+        const hasRequiredRole = requiredRoles.some(role =>
+            role.toLowerCase() === userRole.toLowerCase()
+        );
         if (!hasRequiredRole) {
             throw new ForbiddenException(`Access denied: requires ${requiredRoles.join(', ')} role`);
         }
@@ -90,18 +92,18 @@ export class RolesGuard implements CanActivate {
         // Special handling for resource-specific permissions
         if (this.needsOwnershipCheck(userRole, requiredResource, requiredAction)) {
             // For Patient role, validate resource ownership
-            if (userRole === Role.PATIENT) {
+            if (userRole.toLowerCase() === Role.PATIENT.toLowerCase()) {
                 return await this.validatePatientAccess(userId, resourceId, requiredResource, request);
             }
 
             // For Practitioner role, validate patient assignment
-            if (userRole === Role.PRACTITIONER) {
+            if (userRole.toLowerCase() === Role.PRACTITIONER.toLowerCase()) {
                 return await this.validatePractitionerAccess(userId, resourceId, requiredResource, request);
             }
         }
 
         // Admin can access everything
-        if (userRole === Role.ADMIN) {
+        if (userRole.toLowerCase() === Role.ADMIN.toLowerCase()) {
             return true;
         }
 
@@ -111,7 +113,7 @@ export class RolesGuard implements CanActivate {
 
     private needsOwnershipCheck(role: string, resource: string, action: Action): boolean {
         // Only READ actions for certain resources need ownership check
-        if (role === Role.ADMIN) return false;
+        if (role.toLowerCase() === Role.ADMIN.toLowerCase()) return false;
 
         const resourcesRequiringOwnershipCheck = [
             'Patient', 'Encounter', 'Observation', 'DiagnosticReport',
@@ -128,33 +130,38 @@ export class RolesGuard implements CanActivate {
         resource: string,
         request: Request,
     ): Promise<boolean> {
-        // Implementation would include checks against the database
-        // For example, checking if the Encounter belongs to the patient
+        const user = request['user'] as any;
+        if (!user || !user.fhirResourceId) {
+            return false;
+        }
 
         // For now we'll use a simplified check based on resource type
         if (resource === 'Patient') {
             // Patient can only access their own record
-            return userId === resourceId;
+            // Remove 'res-' prefix if present for comparison
+            const normalizedResourceId = resourceId?.startsWith('res-') ? resourceId.substring(4) : resourceId;
+            const normalizedUserResourceId = user.fhirResourceId?.startsWith('res-') ?
+                user.fhirResourceId.substring(4) : user.fhirResourceId;
+
+            console.log(`Comparing patient resource IDs: ${normalizedUserResourceId} === ${normalizedResourceId}`);
+            return normalizedUserResourceId === normalizedResourceId;
         }
-
-        // For other resources like Encounter, Observation, etc.
-        // Here we would check if the resource is associated with the patient
-        // This is a placeholder for actual database checks
-
-        // Just log what we would check for now
-        console.log(`Validating patient ${userId} access to ${resource} ${resourceId}`);
 
         // For search endpoints, we add a filter to only return the patient's resources
         if (!resourceId && request.method === 'GET') {
             const query = request.query || {};
+            // Use the user's FHIR resource ID for filtering
             request.query = {
                 ...query,
-                patient: userId
+                patient: user.fhirResourceId
             };
             return true;
         }
 
-        // In production, you should implement proper checks
+        // For other resources, allow access to those that belong to the patient
+        // This is a simplified implementation - in production, you would check
+        // if the resource references the patient
+        console.log(`Validating patient ${userId} access to ${resource} ${resourceId}`);
         return true;
     }
 
@@ -164,8 +171,30 @@ export class RolesGuard implements CanActivate {
         resource: string,
         request: Request,
     ): Promise<boolean> {
-        // Implementation would include checks against the database
-        // For example, checking if the Patient is assigned to the Practitioner
+        const user = request['user'] as any;
+        if (!user) {
+            return false;
+        }
+
+        // Remove 'res-' prefix if present for comparison
+        const normalizedResourceId = resourceId?.startsWith('res-') ? resourceId.substring(4) : resourceId;
+        const normalizedUserResourceId = user.fhirResourceId?.startsWith('res-') ?
+            user.fhirResourceId.substring(4) : user.fhirResourceId;
+
+        if (resource === 'Practitioner') {
+            // Practitioner can only access their own record
+            console.log(`Comparing practitioner resource IDs: ${normalizedUserResourceId} === ${normalizedResourceId}`);
+            return normalizedUserResourceId === normalizedResourceId;
+        }
+
+        // For Patient resources, practitioners should have access to their patients
+        // In a real implementation, you would check if the patient is assigned to this practitioner
+        if (resource === 'Patient') {
+            // For demonstration purposes, allow all practitioners to access all patients
+            // In a production environment, you would implement proper checks
+            console.log(`Allowing practitioner ${practitionerId} access to patient ${resourceId}`);
+            return true;
+        }
 
         // For search endpoints, add practitioner context to filter
         if (!resourceId && request.method === 'GET') {
@@ -175,30 +204,31 @@ export class RolesGuard implements CanActivate {
                 // Filter patients by practitioner
                 request.query = {
                     ...query,
-                    'generalPractitioner': practitionerId
+                    'generalPractitioner': user.fhirResourceId
                 };
-            } else {
-                // For clinical resources, no filter needed as the practitioner
-                // will typically need to see all records they're authorized for
-                // In a real implementation, you might add filters based on care team membership
             }
             return true;
         }
 
-        // In production, you should implement proper checks
+        // For other clinical resources, allow access
+        // In a production environment, you would implement more sophisticated checks
         console.log(`Validating practitioner ${practitionerId} access to ${resource} ${resourceId}`);
         return true;
     }
 
     private getDefaultPermission(role: string, resource: string, action: Action): boolean {
+        // Normalize role to lowercase for case-insensitive comparison
+        const normalizedRole = role.toLowerCase();
+
         // Default permission matrix
         const permissionMatrix = {
-            [Role.ADMIN]: {
+            [Role.ADMIN.toLowerCase()]: {
                 // Admin can do everything
                 '*': [Action.CREATE, Action.READ, Action.UPDATE, Action.DELETE, Action.SEARCH],
             },
-            [Role.PRACTITIONER]: {
+            [Role.PRACTITIONER.toLowerCase()]: {
                 'Patient': [Action.READ, Action.SEARCH],
+                'Practitioner': [Action.READ, Action.UPDATE], // Practitioners can update their own profile
                 'Encounter': [Action.CREATE, Action.READ, Action.UPDATE, Action.SEARCH],
                 'Observation': [Action.CREATE, Action.READ, Action.UPDATE, Action.SEARCH],
                 'DiagnosticReport': [Action.CREATE, Action.READ, Action.UPDATE, Action.SEARCH],
@@ -206,12 +236,15 @@ export class RolesGuard implements CanActivate {
                 'MedicationRequest': [Action.CREATE, Action.READ, Action.UPDATE, Action.SEARCH],
                 'Questionnaire': [Action.READ, Action.SEARCH],
                 'QuestionnaireResponse': [Action.CREATE, Action.READ, Action.SEARCH],
+                'CarePlan': [Action.CREATE, Action.READ, Action.UPDATE, Action.SEARCH],
+                'Condition': [Action.CREATE, Action.READ, Action.UPDATE, Action.SEARCH],
+                'Procedure': [Action.CREATE, Action.READ, Action.UPDATE, Action.SEARCH],
                 'Payment': [Action.READ, Action.SEARCH],
                 // For all other resources, default to no access
                 '*': [],
             },
-            [Role.PATIENT]: {
-                'Patient': [Action.READ],
+            [Role.PATIENT.toLowerCase()]: {
+                'Patient': [Action.READ, Action.UPDATE], // Patients can update their own profile
                 'Practitioner': [Action.READ, Action.SEARCH],
                 'Organization': [Action.READ, Action.SEARCH],
                 'Encounter': [Action.READ, Action.SEARCH],
@@ -220,19 +253,19 @@ export class RolesGuard implements CanActivate {
                 'Medication': [Action.READ, Action.SEARCH],
                 'MedicationRequest': [Action.READ, Action.SEARCH],
                 'Questionnaire': [Action.READ, Action.SEARCH],
-                'QuestionnaireResponse': [Action.CREATE, Action.READ, Action.SEARCH],
-                'Payment': [Action.READ, Action.SEARCH],
+                'QuestionnaireResponse': [Action.CREATE, Action.READ, Action.UPDATE, Action.SEARCH],
+                'Payment': [Action.CREATE, Action.READ, Action.UPDATE, Action.SEARCH],
                 // For all other resources, default to no access
                 '*': [],
             },
         };
 
         // Check specific resource permissions
-        if (permissionMatrix[role][resource]) {
-            return permissionMatrix[role][resource].includes(action);
+        if (permissionMatrix[normalizedRole] && permissionMatrix[normalizedRole][resource]) {
+            return permissionMatrix[normalizedRole][resource].includes(action);
         }
 
         // Check wildcard permissions
-        return permissionMatrix[role]['*'].includes(action);
+        return permissionMatrix[normalizedRole] && permissionMatrix[normalizedRole]['*'].includes(action);
     }
 } 

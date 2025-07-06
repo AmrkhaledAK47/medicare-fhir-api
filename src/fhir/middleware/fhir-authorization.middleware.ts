@@ -13,9 +13,9 @@ export class FhirAuthorizationMiddleware implements NestMiddleware {
     private readonly patientRole: string;
 
     constructor(private readonly configService: ConfigService) {
-        this.adminRole = this.configService.get<string>('app.roles.admin') || 'ADMIN';
-        this.practitionerRole = this.configService.get<string>('app.roles.practitioner') || 'PRACTITIONER';
-        this.patientRole = this.configService.get<string>('app.roles.patient') || 'PATIENT';
+        this.adminRole = this.configService.get<string>('app.roles.admin') || 'admin';
+        this.practitionerRole = this.configService.get<string>('app.roles.practitioner') || 'practitioner';
+        this.patientRole = this.configService.get<string>('app.roles.patient') || 'patient';
     }
 
     async use(req: Request & { user?: any }, res: Response, next: NextFunction) {
@@ -31,10 +31,11 @@ export class FhirAuthorizationMiddleware implements NestMiddleware {
             const operation = this.extractOperation(originalUrl);
 
             this.logger.debug(`Checking authorization for ${method} ${originalUrl}`);
-            this.logger.debug(`User: ${user?.id}, Role: ${user?.role}, Resource: ${resourceType}${resourceId ? '/' + resourceId : ''}`);
+            this.logger.debug(`User: ${user?.userId}, Role: ${user?.role}, Resource: ${resourceType}${resourceId ? '/' + resourceId : ''}`);
 
             // Admin has full access to everything
-            if (user.role === this.adminRole) {
+            if (user.role?.toLowerCase() === this.adminRole.toLowerCase()) {
+                this.logger.log(`Admin access granted in FhirAuthorizationMiddleware for ${method} ${originalUrl}`);
                 return next();
             }
 

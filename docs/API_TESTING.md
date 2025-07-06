@@ -8,6 +8,16 @@ This guide provides sample requests to test the FHIR EHR Platform API.
 - You have an HTTP client (like Postman, cURL, or any REST client)
 - You have sample FHIR resources from the `sample_resources` directory
 
+## Important Notes
+
+### Resource ID Requirements
+
+When creating resources with specific IDs, ensure that the IDs contain at least one non-numeric character. The HAPI FHIR server does not allow client-assigned IDs that are purely numeric.
+
+**Example:**
+- ❌ Invalid: `"id": "123"`
+- ✅ Valid: `"id": "res-123"` or `"id": "abc123"`
+
 ## Authentication
 
 ### Register a New User
@@ -468,6 +478,178 @@ Authorization: Bearer eyJhbGciOiJIUzI1...
       }
     }
   ]
+}
+```
+
+## Creating FHIR Resources with Access Codes
+
+### Create a Patient with Access Code
+
+```http
+POST /api/fhir/Patient/with-access-code
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1...
+
+{
+  "resourceType": "Patient",
+  "active": true,
+  "name": [
+    {
+      "use": "official",
+      "family": "Smith",
+      "given": ["John"]
+    }
+  ],
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "555-123-4567",
+      "use": "home"
+    }
+  ],
+  "gender": "male",
+  "birthDate": "1970-01-25",
+  "email": "patient@example.com"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "resource": {
+      "resourceType": "Patient",
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "meta": {
+        "versionId": "1",
+        "lastUpdated": "2023-06-22T16:00:00.000Z"
+      },
+      "active": true,
+      "name": [
+        {
+          "use": "official",
+          "family": "Smith",
+          "given": ["John"]
+        }
+      ],
+      "telecom": [
+        {
+          "system": "phone",
+          "value": "555-123-4567",
+          "use": "home"
+        },
+        {
+          "system": "email",
+          "value": "patient@example.com",
+          "use": "home"
+        }
+      ],
+      "gender": "male",
+      "birthDate": "1970-01-25"
+    },
+    "accessCode": "ABC12345"
+  }
+}
+```
+
+### Create a Practitioner with Access Code
+
+```http
+POST /api/fhir/Practitioner/with-access-code
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1...
+
+{
+  "resourceType": "Practitioner",
+  "active": true,
+  "name": [
+    {
+      "use": "official",
+      "family": "Williams",
+      "given": ["Sarah"],
+      "prefix": ["Dr."]
+    }
+  ],
+  "gender": "female",
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "555-987-6543",
+      "use": "work"
+    }
+  ],
+  "qualification": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+            "code": "MD",
+            "display": "Doctor of Medicine"
+          }
+        ],
+        "text": "Doctor of Medicine"
+      }
+    }
+  ],
+  "email": "practitioner@example.com"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "resource": {
+      "resourceType": "Practitioner",
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "meta": {
+        "versionId": "1",
+        "lastUpdated": "2023-06-22T16:00:00.000Z"
+      },
+      "active": true,
+      "name": [
+        {
+          "use": "official",
+          "family": "Williams",
+          "given": ["Sarah"],
+          "prefix": ["Dr."]
+        }
+      ],
+      "telecom": [
+        {
+          "system": "phone",
+          "value": "555-987-6543",
+          "use": "work"
+        },
+        {
+          "system": "email",
+          "value": "practitioner@example.com",
+          "use": "work"
+        }
+      ],
+      "gender": "female",
+      "qualification": [
+        {
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+                "code": "MD",
+                "display": "Doctor of Medicine"
+              }
+            ],
+            "text": "Doctor of Medicine"
+          }
+        }
+      ]
+    },
+    "accessCode": "XYZ98765"
+  }
 }
 ```
 

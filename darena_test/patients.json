@@ -1,0 +1,197 @@
+[
+  {
+    "resourceType": "Patient",
+    "id": "patient-8699",
+    "active": true,
+    "name": [
+      {
+        "use": "official",
+        "family": "Smith",
+        "given": [
+          "Sarah"
+        ]
+      }
+    ],
+    "gender": "female",
+    "birthDate": "1960-1-1",
+    "address": [
+      {
+        "use": "home",
+        "line": [
+          "100 Main St"
+        ],
+        "city": "Anytown",
+        "state": "CA",
+        "postalCode": "90345",
+        "country": "USA"
+      }
+    ],
+    "telecom": [
+      {
+        "system": "phone",
+        "value": "555-100-4567",
+        "use": "home"
+      },
+      {
+        "system": "email",
+        "value": "sarah.smith@example.com"
+      }
+    ]
+  },
+  {
+    "resourceType": "Patient",
+    "id": "patient-9288",
+    "active": true,
+    "name": [
+      {
+        "use": "official",
+        "family": "Johnson",
+        "given": [
+          "Michael"
+        ]
+      }
+    ],
+    "gender": "male",
+    "birthDate": "1965-2-2",
+    "address": [
+      {
+        "use": "home",
+        "line": [
+          "101 Main St"
+        ],
+        "city": "Anytown",
+        "state": "CA",
+        "postalCode": "91345",
+        "country": "USA"
+      }
+    ],
+    "telecom": [
+      {
+        "system": "phone",
+        "value": "555-101-4568",
+        "use": "home"
+      },
+      {
+        "system": "email",
+        "value": "michael.johnson@example.com"
+      }
+    ]
+  },
+  {
+    "resourceType": "Patient",
+    "id": "patient-7568",
+    "active": true,
+    "name": [
+      {
+        "use": "official",
+        "family": "Williams",
+        "given": [
+          "Jessica"
+        ]
+      }
+    ],
+    "gender": "female",
+    "birthDate": "1970-3-3",
+    "address": [
+      {
+        "use": "home",
+        "line": [
+          "102 Main St"
+        ],
+        "city": "Anytown",
+        "state": "CA",
+        "postalCode": "92345",
+        "country": "USA"
+      }
+    ],
+    "telecom": [
+      {
+        "system": "phone",
+        "value": "555-102-4569",
+        "use": "home"
+      },
+      {
+        "system": "email",
+        "value": "jessica.williams@example.com"
+      }
+    ]
+  },
+  {
+    "resourceType": "Patient",
+    "id": "patient-9912",
+    "active": true,
+    "name": [
+      {
+        "use": "official",
+        "family": "Brown",
+        "given": [
+          "Robert"
+        ]
+      }
+    ],
+    "gender": "male",
+    "birthDate": "1975-4-4",
+    "address": [
+      {
+        "use": "home",
+        "line": [
+          "103 Main St"
+        ],
+        "city": "Anytown",
+        "state": "CA",
+        "postalCode": "93345",
+        "country": "USA"
+      }
+    ],
+    "telecom": [
+      {
+        "system": "phone",
+        "value": "555-103-4570",
+        "use": "home"
+      },
+      {
+        "system": "email",
+        "value": "robert.brown@example.com"
+      }
+    ]
+  },
+  {
+    "resourceType": "Patient",
+    "id": "patient-0510",
+    "active": true,
+    "name": [
+      {
+        "use": "official",
+        "family": "Jones",
+        "given": [
+          "James"
+        ]
+      }
+    ],
+    "gender": "male",
+    "birthDate": "1980-5-5",
+    "address": [
+      {
+        "use": "home",
+        "line": [
+          "104 Main St"
+        ],
+        "city": "Anytown",
+        "state": "CA",
+        "postalCode": "94345",
+        "country": "USA"
+      }
+    ],
+    "telecom": [
+      {
+        "system": "phone",
+        "value": "555-104-4571",
+        "use": "home"
+      },
+      {
+        "system": "email",
+        "value": "james.jones@example.com"
+      }
+    ]
+  }
+]

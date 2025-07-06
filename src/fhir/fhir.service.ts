@@ -9,6 +9,13 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ResourceRegistryService } from './services/resource-registry.service';
 
+export class DownstreamFhirException extends Error {
+    constructor(message: string, public readonly originalError: any) {
+        super(message);
+        this.name = 'DownstreamFhirException';
+    }
+}
+
 @Injectable()
 export class FhirService {
     private readonly baseUrl: string;
@@ -37,19 +44,25 @@ export class FhirService {
         }
     }
 
-    private getRequestConfig(): AxiosRequestConfig {
-        return {
-            headers: {
-                'Content-Type': 'application/fhir+json',
-                'Accept': 'application/fhir+json',
-            },
+    private getRequestConfig(correlationId?: string): AxiosRequestConfig {
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/fhir+json',
+            'Accept': 'application/fhir+json',
         };
+
+        // Add correlation ID header if provided
+        if (correlationId) {
+            headers['X-Correlation-ID'] = correlationId;
+        }
+
+        return { headers };
     }
 
     // Helper method to handle API retries
     private async retryableRequest<T>(
         requestFn: () => Promise<T>,
         operation: string,
+        correlationId?: string
     ): Promise<T> {
         let retries = 0;
         let lastError: any;
@@ -66,17 +79,17 @@ export class FhirService {
                     break;
                 }
 
-                console.log(`Retrying ${operation} (${retries}/${this.maxRetries})`);
+                this.logger.debug(`Retrying ${operation} (${retries}/${this.maxRetries}) [${correlationId}]`);
                 await new Promise(r => setTimeout(r, this.retryDelay));
             }
         }
 
         // If we get here, all retries failed
-        throw this.handleError(lastError, operation);
+        throw this.handleError(lastError, operation, correlationId);
     }
 
     // Helper method to handle API errors
-    private handleError(error: any, operation: string): Error {
+    private handleError(error: any, operation: string, correlationId?: string): Error {
         const axiosError = error as AxiosError;
 
         let errorMessage = `FHIR server operation failed: ${operation}`;
@@ -102,8 +115,15 @@ export class FhirService {
             statusCode = 503; // Service Unavailable
         }
 
-        console.error(`${errorMessage} (${operation})`, error);
-        return new InternalServerErrorException(errorMessage);
+        this.logger.error(`${errorMessage} (${operation}) [${correlationId}]`, {
+            correlationId,
+            operation,
+            errorMessage,
+            statusCode,
+            error: axiosError.stack
+        });
+
+        return new DownstreamFhirException(errorMessage, error);
     }
 
     // Check if user has access to a specific resource
@@ -113,23 +133,40 @@ export class FhirService {
             return true;
         }
 
+        // Normalize resource IDs for comparison (remove 'res-' prefix if present)
+        const normalizedResourceId = resourceId.startsWith('res-') ? resourceId.substring(4) : resourceId;
+        const normalizedUserResourceId = user.fhirResourceId?.startsWith('res-') ?
+            user.fhirResourceId.substring(4) : user.fhirResourceId;
+
         // For patients, check if resource belongs to them
         if (user.role === UserRole.PATIENT) {
             // If resource type is Patient, check if it's their own record
-            if (resourceType === 'Patient' && user.fhirResourceId === resourceId) {
+            if (resourceType === 'Patient' && normalizedUserResourceId === normalizedResourceId) {
                 return true;
             }
 
             // Check if resource is linked to the patient
             const resource = await this.getResource(resourceType, resourceId);
 
-            // Check subject reference for patient
-            if (resource.subject?.reference === `Patient/${user.fhirResourceId}`) {
+            // Extract patient ID from references, handling potential 'res-' prefix
+            let subjectId = null;
+            if (resource.subject?.reference) {
+                const match = resource.subject.reference.match(/Patient\/(?:res-)?(.+)/);
+                subjectId = match ? match[1] : null;
+            }
+
+            let patientId = null;
+            if (resource.patient?.reference) {
+                const match = resource.patient.reference.match(/Patient\/(?:res-)?(.+)/);
+                patientId = match ? match[1] : null;
+            }
+
+            // Compare normalized IDs
+            if (subjectId && normalizedUserResourceId === subjectId) {
                 return true;
             }
 
-            // Check patient reference
-            if (resource.patient?.reference === `Patient/${user.fhirResourceId}`) {
+            if (patientId && normalizedUserResourceId === patientId) {
                 return true;
             }
 
@@ -139,13 +176,38 @@ export class FhirService {
         // For practitioners, check if they have access to this patient's data
         if (user.role === UserRole.PRACTITIONER) {
             // Practitioners can view their own profile
-            if (resourceType === 'Practitioner' && user.fhirResourceId === resourceId) {
+            if (resourceType === 'Practitioner' && normalizedUserResourceId === normalizedResourceId) {
                 return true;
             }
 
-            // Practitioners can generally access patient data they are caring for
-            // In a real system, you'd have a more sophisticated access control check
-            // based on care relationships, encounters, etc.
+            // If the resource is a Patient, we need to check if the practitioner is associated with this patient
+            if (resourceType === 'Patient') {
+                try {
+                    // Get the patient resource
+                    const patientResource = await this.getResource('Patient', resourceId);
+
+                    // Check if this practitioner is the patient's general practitioner
+                    if (patientResource.generalPractitioner && Array.isArray(patientResource.generalPractitioner)) {
+                        for (const practitioner of patientResource.generalPractitioner) {
+                            if (practitioner.reference) {
+                                const match = practitioner.reference.match(/Practitioner\/(?:res-)?(.+)/);
+                                const practId = match ? match[1] : null;
+
+                                if (practId && normalizedUserResourceId === practId) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                } catch (error) {
+                    this.logger.error(`Error checking patient-practitioner relationship: ${error.message}`);
+                    // If we can't verify the relationship, default to false for security
+                    return false;
+                }
+            }
+
+            // For other clinical resources, check if they're associated with a patient this practitioner manages
+            // This is a simplified check - in a production system, you'd have more sophisticated logic
             return true;
         }
 
@@ -153,14 +215,20 @@ export class FhirService {
     }
 
     // Create a new FHIR resource
-    async createResource(resourceType: string, data: any, userId?: string): Promise<any> {
+    async createResource(resourceType: string, data: any, userId?: string, correlationId?: string): Promise<any> {
+        const startTime = Date.now();
         try {
             const response = await this.retryableRequest(
                 async () => {
-                    const result = await axios.post(`${this.baseUrl}/${resourceType}`, data, this.getRequestConfig());
+                    const result = await axios.post(
+                        `${this.baseUrl}/${resourceType}`,
+                        data,
+                        this.getRequestConfig(correlationId)
+                    );
                     return result.data;
                 },
-                `create ${resourceType}`
+                `create ${resourceType}`,
+                correlationId
             );
 
             const resourceId = response.id;
@@ -175,15 +243,20 @@ export class FhirService {
                 lastUpdated: new Date(),
             });
 
+            this.logger.debug(`[FHIR] POST ${resourceType} - ${Date.now() - startTime}ms [${correlationId}]`);
             return response;
         } catch (error) {
-            console.error('Error creating FHIR resource:', error);
-            throw error;
+            this.logger.error(
+                `Error creating FHIR ${resourceType}: ${error.message} [${correlationId}]`,
+                { correlationId, resourceType, error: error.stack }
+            );
+            throw new DownstreamFhirException(`Failed to create ${resourceType}`, error);
         }
     }
 
     // Get a FHIR resource by type and ID
-    async getResource(resourceType: string, id: string): Promise<any> {
+    async getResource(resourceType: string, id: string, correlationId?: string): Promise<any> {
+        const startTime = Date.now();
         try {
             // Check cache first
             const localResource = await this.fhirResourceModel.findOne({
@@ -192,16 +265,21 @@ export class FhirService {
             }).lean();
 
             if (localResource) {
+                this.logger.debug(`[FHIR] GET ${resourceType}/${id} - cached [${correlationId}]`);
                 return localResource.data;
             }
 
             // Fetch from FHIR server if not in cache
             const response = await this.retryableRequest(
                 async () => {
-                    const result = await axios.get(`${this.baseUrl}/${resourceType}/${id}`, this.getRequestConfig());
+                    const result = await axios.get(
+                        `${this.baseUrl}/${resourceType}/${id}`,
+                        this.getRequestConfig(correlationId)
+                    );
                     return result.data;
                 },
-                `get ${resourceType}/${id}`
+                `get ${resourceType}/${id}`,
+                correlationId
             );
 
             // Cache the response
@@ -213,153 +291,257 @@ export class FhirService {
                 lastUpdated: new Date(),
             });
 
+            this.logger.debug(`[FHIR] GET ${resourceType}/${id} - ${Date.now() - startTime}ms [${correlationId}]`);
             return response;
         } catch (error) {
             if (error.response && error.response.status === 404) {
                 throw new NotFoundException(`FHIR Resource ${resourceType}/${id} not found`);
             }
-            console.error(`Error getting FHIR resource ${resourceType}/${id}:`, error);
-            throw error;
+            this.logger.error(`Error getting FHIR resource ${resourceType}/${id}: ${error.message} [${correlationId}]`, {
+                correlationId,
+                resourceType,
+                id,
+                error: error.stack
+            });
+            throw new DownstreamFhirException(`Failed to get ${resourceType}/${id}`, error);
         }
     }
 
     // Get resource with permission check
-    async getResourceWithPermissionCheck(resourceType: string, id: string, user: any): Promise<any> {
-        // Check if user has access to this resource
-        const hasAccess = await this.checkResourceAccess(resourceType, id, user);
+    async getResourceWithPermissionCheck(resourceType: string, id: string, user: any, correlationId?: string): Promise<any> {
+        const startTime = Date.now();
+        try {
+            // Check if user has access to this resource
+            const hasAccess = await this.checkResourceAccess(resourceType, id, user);
+            if (!hasAccess) {
+                this.logger.warn(`User ${user.id} (${user.role}) denied access to ${resourceType}/${id} [${correlationId}]`);
+                throw new ForbiddenException(`Access denied to ${resourceType}/${id}`);
+            }
 
-        if (!hasAccess) {
-            throw new ForbiddenException('You do not have permission to access this resource');
+            // Get the resource
+            const resource = await this.getResource(resourceType, id, correlationId);
+
+            this.logger.debug(`Access granted to ${resourceType}/${id} for user ${user.id} (${user.role}) [${correlationId}]`);
+            return resource;
+        } catch (error) {
+            if (error instanceof ForbiddenException) {
+                throw error;
+            }
+            this.logger.error(`Error getting FHIR resource with permission check ${resourceType}/${id}: ${error.message} [${correlationId}]`, {
+                correlationId,
+                resourceType,
+                id,
+                userId: user.id,
+                userRole: user.role,
+                error: error.stack
+            });
+            throw new DownstreamFhirException(`Failed to get ${resourceType}/${id}`, error);
         }
-
-        return this.getResource(resourceType, id);
     }
 
     // Update an existing FHIR resource
-    async updateResource(resourceType: string, id: string, data: any): Promise<any> {
+    async updateResource(resourceType: string, id: string, data: any, correlationId?: string): Promise<any> {
+        const startTime = Date.now();
         try {
+            // Ensure the ID in the URL matches the ID in the resource
+            if (data.id && data.id !== id) {
+                throw new Error(`Resource ID mismatch: URL ID ${id} doesn't match resource ID ${data.id}`);
+            }
+
             const response = await this.retryableRequest(
                 async () => {
-                    const result = await axios.put(`${this.baseUrl}/${resourceType}/${id}`, data, this.getRequestConfig());
+                    const result = await axios.put(
+                        `${this.baseUrl}/${resourceType}/${id}`,
+                        data,
+                        this.getRequestConfig(correlationId)
+                    );
                     return result.data;
                 },
-                `update ${resourceType}/${id}`
+                `update ${resourceType}/${id}`,
+                correlationId
             );
 
-            // Update cache
-            await this.fhirResourceModel.findOneAndUpdate(
+            // Update in local database
+            await this.fhirResourceModel.updateOne(
+                { resourceType, resourceId: id },
                 {
-                    resourceType,
-                    resourceId: id,
-                },
-                {
-                    data: response,
-                    version: response.meta?.versionId || '1',
-                    lastUpdated: new Date(),
+                    $set: {
+                        data: response,
+                        version: response.meta?.versionId || '1',
+                        lastUpdated: new Date(),
+                    },
                 },
                 { upsert: true }
             );
 
+            this.logger.debug(`[FHIR] PUT ${resourceType}/${id} - ${Date.now() - startTime}ms [${correlationId}]`);
             return response;
         } catch (error) {
-            console.error(`Error updating FHIR resource ${resourceType}/${id}:`, error);
-            throw error;
+            this.logger.error(`Error updating FHIR ${resourceType}/${id}: ${error.message} [${correlationId}]`, {
+                correlationId,
+                resourceType,
+                id,
+                error: error.stack
+            });
+            throw new DownstreamFhirException(`Failed to update ${resourceType}/${id}`, error);
         }
     }
 
     // Update resource with permission check
-    async updateResourceWithPermissionCheck(resourceType: string, id: string, data: any, user: any): Promise<any> {
-        // Check if user has access to update this resource
-        const hasAccess = await this.checkResourceAccess(resourceType, id, user);
+    async updateResourceWithPermissionCheck(resourceType: string, id: string, data: any, user: any, correlationId?: string): Promise<any> {
+        const startTime = Date.now();
+        try {
+            // Check if user has access to this resource
+            const hasAccess = await this.checkResourceAccess(resourceType, id, user);
+            if (!hasAccess) {
+                this.logger.warn(`User ${user.id} (${user.role}) denied access to update ${resourceType}/${id} [${correlationId}]`);
+                throw new ForbiddenException(`Access denied to update ${resourceType}/${id}`);
+            }
 
-        if (!hasAccess) {
-            throw new ForbiddenException('You do not have permission to update this resource');
+            // Update the resource
+            const resource = await this.updateResource(resourceType, id, data, correlationId);
+
+            this.logger.debug(`Resource ${resourceType}/${id} updated by user ${user.id} (${user.role}) [${correlationId}]`);
+            return resource;
+        } catch (error) {
+            if (error instanceof ForbiddenException) {
+                throw error;
+            }
+            this.logger.error(`Error updating FHIR resource with permission check ${resourceType}/${id}: ${error.message} [${correlationId}]`, {
+                correlationId,
+                resourceType,
+                id,
+                userId: user.id,
+                userRole: user.role,
+                error: error.stack
+            });
+            throw new DownstreamFhirException(`Failed to update ${resourceType}/${id}`, error);
         }
-
-        return this.updateResource(resourceType, id, data);
     }
 
     // Delete a FHIR resource
-    async deleteResource(resourceType: string, id: string): Promise<void> {
+    async deleteResource(resourceType: string, id: string, correlationId?: string): Promise<void> {
+        const startTime = Date.now();
         try {
             await this.retryableRequest(
                 async () => {
-                    const result = await axios.delete(`${this.baseUrl}/${resourceType}/${id}`, this.getRequestConfig());
+                    const result = await axios.delete(
+                        `${this.baseUrl}/${resourceType}/${id}`,
+                        this.getRequestConfig(correlationId)
+                    );
                     return result.data;
                 },
-                `delete ${resourceType}/${id}`
+                `delete ${resourceType}/${id}`,
+                correlationId
             );
 
-            // Remove from cache
-            await this.fhirResourceModel.findOneAndDelete({
-                resourceType,
-                resourceId: id,
-            });
+            // Remove from local database
+            await this.fhirResourceModel.deleteOne({ resourceType, resourceId: id });
+
+            this.logger.debug(`[FHIR] DELETE ${resourceType}/${id} - ${Date.now() - startTime}ms [${correlationId}]`);
         } catch (error) {
-            console.error(`Error deleting FHIR resource ${resourceType}/${id}:`, error);
-            throw error;
+            this.logger.error(`Error deleting FHIR ${resourceType}/${id}: ${error.message} [${correlationId}]`, {
+                correlationId,
+                resourceType,
+                id,
+                error: error.stack
+            });
+            throw new DownstreamFhirException(`Failed to delete ${resourceType}/${id}`, error);
         }
     }
 
     // Search for FHIR resources
-    async searchResources(resourceType: string, params: Record<string, string>): Promise<any> {
+    async searchResources(resourceType: string, params: Record<string, string>, correlationId?: string): Promise<any> {
+        const startTime = Date.now();
         try {
-            // List of NestJS-specific parameters that should not be passed to FHIR
+            // Filter out NestJS-specific parameters that HAPI FHIR doesn't understand
+            const filteredParams = { ...params };
             const nestJsSpecificParams = ['sortDirection', 'sort', 'page', 'limit', 'search'];
+            nestJsSpecificParams.forEach(param => {
+                if (param in filteredParams) {
+                    delete filteredParams[param];
+                }
+            });
 
-            // Filter out NestJS-specific parameters
-            const filteredParams = Object.keys(params)
-                .filter(key => !nestJsSpecificParams.includes(key))
-                .reduce((obj, key) => {
-                    obj[key] = params[key];
-                    return obj;
-                }, {} as Record<string, string>);
-
-            const queryString = new URLSearchParams(filteredParams).toString();
-            const url = `${this.baseUrl}/${resourceType}?${queryString}`;
-
-            this.logger.debug(`Searching ${resourceType} with filtered params: ${queryString}`);
-
-            return await this.retryableRequest(
+            const response = await this.retryableRequest(
                 async () => {
-                    const result = await axios.get(url, this.getRequestConfig());
+                    const config = this.getRequestConfig(correlationId);
+                    config.params = filteredParams;
+                    const result = await axios.get(`${this.baseUrl}/${resourceType}`, config);
                     return result.data;
                 },
-                `search ${resourceType}`
+                `search ${resourceType}`,
+                correlationId
             );
+
+            this.logger.debug(`[FHIR] SEARCH ${resourceType} - ${Date.now() - startTime}ms [${correlationId}]`);
+            return response;
         } catch (error) {
-            console.error(`Error searching FHIR resources of type ${resourceType}:`, error);
-            throw error;
+            this.logger.error(`Error searching FHIR ${resourceType}: ${error.message} [${correlationId}]`, {
+                correlationId,
+                resourceType,
+                params,
+                error: error.stack
+            });
+            throw new DownstreamFhirException(`Failed to search ${resourceType}`, error);
         }
     }
 
-    // Search resources with permission check
-    async searchResourcesWithPermissionCheck(resourceType: string, params: Record<string, string>, user: any): Promise<any> {
-        // For patients, automatically filter results to only include their resources
-        if (user.role === UserRole.PATIENT && user.fhirResourceId) {
-            // Add patient filter for relevant resource types
-            if (resourceType === 'Observation' || resourceType === 'DiagnosticReport' ||
-                resourceType === 'Encounter' || resourceType === 'Procedure' ||
-                resourceType === 'CarePlan' || resourceType === 'Condition') {
-                params = {
-                    ...params,
-                    patient: user.fhirResourceId
-                };
+    // Search for FHIR resources with permission check
+    async searchResourcesWithPermissionCheck(
+        resourceType: string,
+        params: Record<string, string>,
+        user: any,
+        correlationId?: string
+    ): Promise<any> {
+        const startTime = Date.now();
+        try {
+            // For Patient resources, patients should only see their own record
+            if (resourceType === 'Patient' && user.role === UserRole.PATIENT) {
+                if (user.fhirResourceId) {
+                    // Override any search parameters and just get their own record
+                    return this.getResourceWithPermissionCheck('Patient', user.fhirResourceId, user, correlationId);
+                } else {
+                    this.logger.warn(`Patient user ${user.id} has no FHIR resource ID [${correlationId}]`);
+                    throw new ForbiddenException('Patient account not linked to clinical data');
+                }
             }
 
-            // For Patient resource type, only allow searching their own record
-            if (resourceType === 'Patient') {
-                params = {
-                    ...params,
-                    _id: user.fhirResourceId
-                };
+            // For other resources or users, apply appropriate filters
+            let filteredParams = { ...params };
+
+            // For patients, filter resources to only show their own
+            if (user.role === UserRole.PATIENT && user.fhirResourceId) {
+                // Add patient reference filter for resources that link to patients
+                if (['Observation', 'Condition', 'MedicationStatement', 'Appointment'].includes(resourceType)) {
+                    filteredParams.patient = `Patient/${user.fhirResourceId}`;
+                } else if (['DiagnosticReport', 'CarePlan', 'Goal'].includes(resourceType)) {
+                    filteredParams.subject = `Patient/${user.fhirResourceId}`;
+                }
             }
+
+            // For practitioners, they can see all resources they have access to
+            // In a real system, you'd add filters based on care relationships
+
+            // Perform the search with filtered parameters
+            const result = await this.searchResources(resourceType, filteredParams, correlationId);
+
+            this.logger.debug(`Search ${resourceType} completed for user ${user.id} (${user.role}) [${correlationId}]`);
+            return result;
+        } catch (error) {
+            if (error instanceof ForbiddenException) {
+                throw error;
+            }
+            this.logger.error(`Error searching FHIR ${resourceType} with permission check: ${error.message} [${correlationId}]`, {
+                correlationId,
+                resourceType,
+                params,
+                userId: user.id,
+                userRole: user.role,
+                error: error.stack
+            });
+            throw new DownstreamFhirException(`Failed to search ${resourceType}`, error);
         }
-
-        // For practitioners, they generally have access to patient data they're caring for
-        // In a real system, you might filter by practitioner ID for certain resources
-
-        return this.searchResources(resourceType, params);
     }
 
     // Get resources associated with a specific user
@@ -368,7 +550,7 @@ export class FhirService {
     }
 
     // Check if FHIR server is available
-    async checkServerHealth(): Promise<boolean> {
+    async checkHealth(): Promise<boolean> {
         try {
             await axios.get(`${this.baseUrl}/metadata`, {
                 headers: { 'Accept': 'application/fhir+json' },
@@ -376,7 +558,7 @@ export class FhirService {
             });
             return true;
         } catch (error) {
-            console.error('FHIR server health check failed:', error);
+            this.logger.error('FHIR server health check failed:', error);
             return false;
         }
     }
@@ -541,6 +723,243 @@ export class FhirService {
         } catch (error) {
             this.logger.error('HAPI FHIR server health check failed', error);
             return false;
+        }
+    }
+
+    /**
+     * Ensure proper capitalization of FHIR resource types
+     * FHIR is case sensitive and resource types must be properly capitalized
+     */
+    normalizeResourceType(resourceType: string): string {
+        // Standard FHIR resource types with proper capitalization
+        const fhirResourceTypes = [
+            'Account', 'ActivityDefinition', 'AdverseEvent', 'AllergyIntolerance',
+            'Appointment', 'AppointmentResponse', 'AuditEvent', 'Basic', 'Binary',
+            'BiologicallyDerivedProduct', 'BodyStructure', 'Bundle', 'CapabilityStatement',
+            'CarePlan', 'CareTeam', 'CatalogEntry', 'ChargeItem', 'ChargeItemDefinition',
+            'Claim', 'ClaimResponse', 'ClinicalImpression', 'CodeSystem', 'Communication',
+            'CommunicationRequest', 'CompartmentDefinition', 'Composition', 'ConceptMap',
+            'Condition', 'Consent', 'Contract', 'Coverage', 'CoverageEligibilityRequest',
+            'CoverageEligibilityResponse', 'DetectedIssue', 'Device', 'DeviceDefinition',
+            'DeviceMetric', 'DeviceRequest', 'DeviceUseStatement', 'DiagnosticReport',
+            'DocumentManifest', 'DocumentReference', 'EffectEvidenceSynthesis', 'Encounter',
+            'Endpoint', 'EnrollmentRequest', 'EnrollmentResponse', 'EpisodeOfCare', 'EventDefinition',
+            'Evidence', 'EvidenceVariable', 'ExampleScenario', 'ExplanationOfBenefit',
+            'FamilyMemberHistory', 'Flag', 'Goal', 'GraphDefinition', 'Group', 'GuidanceResponse',
+            'HealthcareService', 'ImagingStudy', 'Immunization', 'ImmunizationEvaluation',
+            'ImmunizationRecommendation', 'ImplementationGuide', 'InsurancePlan', 'Invoice',
+            'Library', 'Linkage', 'List', 'Location', 'Measure', 'MeasureReport', 'Media',
+            'Medication', 'MedicationAdministration', 'MedicationDispense', 'MedicationKnowledge',
+            'MedicationRequest', 'MedicationStatement', 'MedicinalProduct', 'MedicinalProductAuthorization',
+            'MedicinalProductContraindication', 'MedicinalProductIndication', 'MedicinalProductIngredient',
+            'MedicinalProductInteraction', 'MedicinalProductManufactured', 'MedicinalProductPackaged',
+            'MedicinalProductPharmaceutical', 'MedicinalProductUndesirableEffect', 'MessageDefinition',
+            'MessageHeader', 'MolecularSequence', 'NamingSystem', 'NutritionOrder', 'Observation',
+            'ObservationDefinition', 'OperationDefinition', 'OperationOutcome', 'Organization',
+            'OrganizationAffiliation', 'Parameters', 'Patient', 'PaymentNotice', 'PaymentReconciliation',
+            'Person', 'PlanDefinition', 'Practitioner', 'PractitionerRole', 'Procedure', 'Provenance',
+            'Questionnaire', 'QuestionnaireResponse', 'RelatedPerson', 'RequestGroup', 'ResearchDefinition',
+            'ResearchElementDefinition', 'ResearchStudy', 'ResearchSubject', 'RiskAssessment',
+            'RiskEvidenceSynthesis', 'Schedule', 'SearchParameter', 'ServiceRequest', 'Slot', 'Specimen',
+            'SpecimenDefinition', 'StructureDefinition', 'StructureMap', 'Subscription', 'Substance',
+            'SubstanceNucleicAcid', 'SubstancePolymer', 'SubstanceProtein', 'SubstanceReferenceInformation',
+            'SubstanceSourceMaterial', 'SubstanceSpecification', 'SupplyDelivery', 'SupplyRequest', 'Task',
+            'TerminologyCapabilities', 'TestReport', 'TestScript', 'ValueSet', 'VerificationResult',
+            'VisionPrescription'
+        ];
+
+        // Custom resource types specific to this application
+        const customResourceTypes = ['Payment'];
+
+        const allResourceTypes = [...fhirResourceTypes, ...customResourceTypes];
+
+        // Find a matching resource type regardless of case
+        const match = allResourceTypes.find(type =>
+            type.toLowerCase() === resourceType.toLowerCase()
+        );
+
+        return match || resourceType; // Return the properly cased version or the original if not found
+    }
+
+    /**
+     * Normalize a FHIR resource ID by removing 'res-' prefix if present
+     */
+    normalizeResourceId(id: string): string {
+        return id.startsWith('res-') ? id.substring(4) : id;
+    }
+
+    /**
+     * Get the latest observations for a patient by LOINC code
+     */
+    async getLatestObservationsByLoinc(patientId: string, loincCodes: string[]): Promise<any[]> {
+        try {
+            const normalizedPatientId = this.normalizeResourceId(patientId);
+
+            const searchParams = {
+                patient: normalizedPatientId,
+                code: loincCodes.join(','),
+                _sort: '-date',
+                _count: '10',
+                status: 'final,amended,corrected',
+            };
+
+            const response = await this.searchResources('Observation', searchParams);
+
+            // Extract unique latest observation per code
+            const latestByCode = new Map();
+            if (response.entry && Array.isArray(response.entry)) {
+                for (const entry of response.entry) {
+                    const resource = entry.resource;
+                    if (resource && resource.code && resource.code.coding) {
+                        for (const coding of resource.code.coding) {
+                            if (loincCodes.includes(coding.code) && !latestByCode.has(coding.code)) {
+                                latestByCode.set(coding.code, resource);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Array.from(latestByCode.values());
+        } catch (error) {
+            this.logger.error(`Error fetching observations for patient ${patientId}: ${error.message}`);
+            throw new DownstreamFhirException(`Failed to fetch observations for patient ${patientId}`, error);
+        }
+    }
+
+    /**
+     * Get upcoming appointments for a patient
+     */
+    async getUpcomingAppointments(patientId: string, count: number = 5): Promise<any[]> {
+        try {
+            const normalizedPatientId = this.normalizeResourceId(patientId);
+            const today = new Date().toISOString().split('T')[0];
+
+            const searchParams = {
+                patient: normalizedPatientId,
+                date: `ge${today}`,
+                _sort: 'date',
+                _count: count.toString(),
+                status: 'booked,pending',
+                // Fix: Use separate _include parameters instead of comma-separated values
+                '_include': 'Appointment:practitioner',
+                '_include:1': 'Appointment:location',
+            };
+
+            this.logger.debug(`Fetching upcoming appointments with params: ${JSON.stringify(searchParams)}`);
+            const response = await this.searchResources('Appointment', searchParams);
+
+            // Extract appointments and included resources
+            const appointments = [];
+            const includedResources = {};
+
+            if (response.entry && Array.isArray(response.entry)) {
+                // First, collect all included resources by reference
+                response.entry.forEach(entry => {
+                    const resource = entry.resource;
+                    if (resource && resource.resourceType && resource.id) {
+                        if (resource.resourceType !== 'Appointment') {
+                            const reference = `${resource.resourceType}/${resource.id}`;
+                            includedResources[reference] = resource;
+                        }
+                    }
+                });
+
+                // Then extract appointments and enrich with included resources
+                response.entry.forEach(entry => {
+                    const resource = entry.resource;
+                    if (resource && resource.resourceType === 'Appointment') {
+                        // Enrich participants with included resources
+                        if (resource.participant && Array.isArray(resource.participant)) {
+                            resource.participant.forEach(participant => {
+                                if (participant.actor && participant.actor.reference) {
+                                    const ref = participant.actor.reference;
+                                    if (includedResources[ref]) {
+                                        participant.actor.resource = includedResources[ref];
+                                    }
+                                }
+                            });
+                        }
+                        appointments.push(resource);
+                    }
+                });
+            }
+
+            return appointments;
+        } catch (error) {
+            this.logger.error(`Error fetching appointments for patient ${patientId}: ${error.message}`);
+            throw new DownstreamFhirException(`Failed to fetch appointments for patient ${patientId}`, error);
+        }
+    }
+
+    private buildRequestOptions(options: any = {}): AxiosRequestConfig {
+        return {
+            headers: {
+                'Content-Type': 'application/fhir+json',
+                'Accept': 'application/fhir+json',
+                ...options.headers,
+            },
+            ...options,
+        };
+    }
+
+    /**
+     * Create a FHIR resource
+     * @param resourceType The FHIR resource type (e.g., 'Patient', 'Observation')
+     * @param resource The resource data
+     * @returns The created resource with server-assigned ID
+     */
+    async create(resourceType: string, resource: any): Promise<any> {
+        try {
+            const response = await firstValueFrom(
+                this.httpService.post(
+                    `${this.hapiFhirUrl}/${resourceType}`,
+                    resource,
+                    {
+                        headers: {
+                            'Content-Type': 'application/fhir+json',
+                            'Accept': 'application/fhir+json',
+                        },
+                    }
+                )
+            );
+            return response.data;
+        } catch (error) {
+            const axiosError = error as AxiosError;
+            this.logger.error(
+                `Failed to create FHIR resource: ${axiosError.message}`,
+                axiosError.stack,
+            );
+            throw new Error(`Failed to create FHIR resource: ${axiosError.message}`);
+        }
+    }
+
+    /**
+     * Delete a FHIR resource
+     * @param resourceType The FHIR resource type (e.g., 'Patient', 'Observation')
+     * @param id The resource ID
+     * @returns The operation outcome
+     */
+    async delete(resourceType: string, id: string): Promise<any> {
+        try {
+            const response = await firstValueFrom(
+                this.httpService.delete(
+                    `${this.hapiFhirUrl}/${resourceType}/${id}`,
+                    {
+                        headers: {
+                            'Accept': 'application/fhir+json',
+                        },
+                    }
+                )
+            );
+            return response.data;
+        } catch (error) {
+            const axiosError = error as AxiosError;
+            this.logger.error(
+                `Failed to delete FHIR resource: ${axiosError.message}`,
+                axiosError.stack,
+            );
+            throw new Error(`Failed to delete FHIR resource: ${axiosError.message}`);
         }
     }
 } 

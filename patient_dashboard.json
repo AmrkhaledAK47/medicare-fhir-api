@@ -1,0 +1,282 @@
+{
+  "success": true,
+  "data": {
+    "profile": {
+      "id": "68646b3dd03688a3429b53f0",
+      "name": "John Smith",
+      "email": "patient@example.com",
+      "role": "patient",
+      "status": "active",
+      "profileImageUrl": "/uploads/undefined",
+      "isEmailVerified": false,
+      "fhirDetails": {
+        "resourceType": "Patient",
+        "resourceId": "422",
+        "details": {
+          "name": "John Smith",
+          "gender": "male",
+          "birthDate": "1990-01-01",
+          "telecom": [
+            {
+              "system": "email",
+              "value": "patient@example.com",
+              "use": "home"
+            }
+          ],
+          "photo": "http://localhost:3000/api/uploads/undefined"
+        }
+      },
+      "diseases": {
+        "speech": [],
+        "physical": []
+      }
+    },
+    "biomarkers": [
+      {
+        "type": "liver",
+        "name": "Aspartate aminotransferase [Enzymatic activity/volume] in Serum or Plasma",
+        "value": "28",
+        "unit": "U/L",
+        "referenceRange": "10-40",
+        "status": "normal",
+        "date": "2025-07-01T10:15:00Z"
+      },
+      {
+        "type": "kidney",
+        "name": "Creatinine [Mass/volume] in Serum or Plasma",
+        "value": "0.9",
+        "unit": "mg/dL",
+        "status": "normal",
+        "date": "2025-07-01T10:15:00Z"
+      },
+      {
+        "type": "sugar",
+        "name": "Glucose [Mass/volume] in Serum or Plasma",
+        "value": "95",
+        "unit": "mg/dL",
+        "status": "normal",
+        "date": "2025-07-01T10:15:00Z"
+      },
+      {
+        "type": "blood",
+        "name": "Hemoglobin [Mass/volume] in Blood",
+        "value": "14.2",
+        "unit": "g/dL",
+        "referenceRange": "12-16",
+        "status": "normal",
+        "date": "2025-07-01T10:15:00Z"
+      },
+      {
+        "type": "heart",
+        "name": "Heart",
+        "value": "No data",
+        "unit": "",
+        "status": "unknown",
+        "date": "2025-07-04T09:29:40.908Z"
+      },
+      {
+        "type": "thyroid",
+        "name": "Thyroid",
+        "value": "No data",
+        "unit": "",
+        "status": "unknown",
+        "date": "2025-07-04T09:29:40.908Z"
+      },
+      {
+        "type": "bone",
+        "name": "Bone",
+        "value": "No data",
+        "unit": "",
+        "status": "unknown",
+        "date": "2025-07-04T09:29:40.908Z"
+      }
+    ],
+    "appointments": [
+      {
+        "id": "668",
+        "start": "2025-07-15T09:00:00Z",
+        "end": "2025-07-15T09:30:00Z",
+        "description": "Annual physical examination",
+        "status": "booked",
+        "practitioner": {
+          "id": "practitioner-1",
+          "name": "Sarah Johnson",
+          "speciality": "Doctor of Medicine"
+        },
+        "location": {
+          "id": "location-1",
+          "name": "Main Hospital"
+        },
+        "appointmentType": "in-person"
+      },
+      {
+        "id": "681",
+        "start": "2025-07-15T09:00:00Z",
+        "end": "2025-07-15T09:30:00Z",
+        "description": "Annual physical examination",
+        "status": "booked",
+        "practitioner": {
+          "id": "practitioner-1",
+          "name": "Sarah Johnson",
+          "speciality": "Doctor of Medicine"
+        },
+        "location": {
+          "id": "location-1",
+          "name": "Main Hospital"
+        },
+        "appointmentType": "in-person"
+      },
+      {
+        "id": "697",
+        "start": "2025-07-15T09:00:00Z",
+        "end": "2025-07-15T09:30:00Z",
+        "description": "Annual physical examination",
+        "status": "booked",
+        "practitioner": {
+          "id": "practitioner-1",
+          "name": "Sarah Johnson",
+          "speciality": "Doctor of Medicine"
+        },
+        "location": {
+          "id": "location-1",
+          "name": "Main Hospital"
+        },
+        "appointmentType": "in-person"
+      },
+      {
+        "id": "711",
+        "start": "2025-07-15T09:00:00Z",
+        "end": "2025-07-15T09:30:00Z",
+        "description": "Annual physical examination",
+        "status": "booked",
+        "practitioner": {
+          "id": "practitioner-1",
+          "name": "Sarah Johnson",
+          "speciality": "Doctor of Medicine"
+        },
+        "location": {
+          "id": "location-1",
+          "name": "Main Hospital"
+        },
+        "appointmentType": "in-person"
+      },
+      {
+        "id": "722",
+        "start": "2025-07-15T09:00:00Z",
+        "end": "2025-07-15T09:30:00Z",
+        "description": "Annual physical examination",
+        "status": "booked",
+        "practitioner": {
+          "id": "practitioner-1",
+          "name": "Sarah Johnson",
+          "speciality": "Doctor of Medicine"
+        },
+        "location": {
+          "id": "location-1",
+          "name": "Main Hospital"
+        },
+        "appointmentType": "in-person"
+      }
+    ],
+    "calendar": [
+      {
+        "date": "2025-07-05",
+        "events": [
+          {
+            "date": "2025-07-05",
+            "id": "servicerequest-3",
+            "title": "Flu Vaccination",
+            "time": "11:00",
+            "type": "reminder"
+          }
+        ]
+      },
+      {
+        "date": "2025-07-10",
+        "events": [
+          {
+            "date": "2025-07-10",
+            "id": "careplan-1-0",
+            "title": "Check blood glucose levels",
+            "time": "08:00",
+            "type": "task"
+          }
+        ]
+      },
+      {
+        "date": "2025-07-12",
+        "events": [
+          {
+            "date": "2025-07-12",
+            "id": "careplan-1-1",
+            "title": "30-minute walk",
+            "time": "17:30",
+            "type": "task"
+          }
+        ]
+      },
+      {
+        "date": "2025-07-18",
+        "events": [
+          {
+            "date": "2025-07-18",
+            "id": "careplan-2-2",
+            "title": "Blood pressure monitoring",
+            "time": "09:00",
+            "type": "task"
+          }
+        ]
+      },
+      {
+        "date": "2025-07-25",
+        "events": [
+          {
+            "date": "2025-07-25",
+            "id": "servicerequest-1",
+            "title": "Complete Blood Count (CBC)",
+            "time": "10:30",
+            "type": "reminder"
+          }
+        ]
+      },
+      {
+        "date": "2025-07-28",
+        "events": [
+          {
+            "date": "2025-07-28",
+            "id": "servicerequest-2",
+            "title": "Chest X-Ray",
+            "time": "14:15",
+            "type": "reminder"
+          }
+        ]
+      }
+    ],
+    "quickActions": [
+      {
+        "id": "request-consultation",
+        "title": "Request Consultation",
+        "description": "Talk to a specialist",
+        "url": "http://localhost:3000/api/consultations/request",
+        "type": "consultation",
+        "icon": "consultation"
+      },
+      {
+        "id": "locate-hospital",
+        "title": "Locate a Hospital",
+        "description": "Find closest hospitals",
+        "url": "http://localhost:3000/api/locations/hospitals",
+        "type": "location",
+        "icon": "hospital"
+      },
+      {
+        "id": "emergency",
+        "title": "Emergency",
+        "description": "Request immediate help",
+        "url": "http://localhost:3000/api/emergency",
+        "type": "emergency",
+        "icon": "emergency"
+      }
+    ]
+  }
+}

@@ -11,6 +11,7 @@ import {
     Patch,
     UseInterceptors,
     UploadedFile,
+    BadRequestException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -23,6 +24,7 @@ import * as multer from 'multer';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateUserWithResourceDto } from './dto/create-user-with-resource.dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
 import { UserRole, UserDocument } from './schemas/user.schema';
 
 @ApiTags('users')
@@ -176,5 +178,34 @@ export class UsersController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     async getUserProfile(@Param('id') id: string) {
         return this.usersService.getUserProfile(id);
+    }
+
+    @Post('admin')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Create a new admin user directly (Admin only)' })
+    @ApiResponse({ status: 201, description: 'Admin user created successfully' })
+    @ApiResponse({ status: 400, description: 'Invalid input data' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin access required' })
+    @ApiResponse({ status: 409, description: 'User with this email already exists' })
+    async createAdminUser(@Body() createAdminDto: CreateAdminDto) {
+        const adminUser = await this.usersService.createAdminUser(createAdminDto);
+
+        // Cast the user to UserDocument to access Mongoose document properties
+        const userDoc = adminUser as UserDocument;
+
+        return {
+            success: true,
+            message: 'Admin user created successfully',
+            data: {
+                id: userDoc._id.toString(),
+                name: userDoc.name,
+                email: userDoc.email,
+                role: userDoc.role,
+                status: userDoc.status
+            }
+        };
     }
 } 

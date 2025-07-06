@@ -42,11 +42,11 @@ export class RegisterDto {
     @ApiProperty({
         description: 'Access code for registration (required for all accounts except first admin)',
         example: 'ABC123XYZ',
-        required: true
+        required: false
     })
     @IsString()
-    @IsNotEmpty({ message: 'Access code is required' })
-    accessCode: string;
+    @IsOptional()
+    accessCode?: string;
 
     @ApiProperty({
         description: 'Phone number',

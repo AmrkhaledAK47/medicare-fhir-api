@@ -10,6 +10,8 @@ import {
     Query,
     Req,
     HttpStatus,
+    NotFoundException,
+    BadRequestException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { FhirService } from './fhir.service';
@@ -20,15 +22,23 @@ import { ResourceQueryDto } from './dto/resource-query.dto';
 import { Request } from 'express';
 import { ResourceRegistryService } from './services/resource-registry.service';
 import { Public } from '../auth/decorators/public.decorator';
+import { GenericResourceService } from './services/generic-resource.service';
+import { AccessCodesService } from '../access-codes/access-codes.service';
+import { Logger } from '@nestjs/common';
+import axios from 'axios'; // Added axios import
 
 @ApiTags('fhir')
 @Controller('fhir')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class FhirController {
+    private readonly logger = new Logger(FhirController.name);
+
     constructor(
         private readonly fhirService: FhirService,
         private readonly resourceRegistry: ResourceRegistryService,
+        private readonly genericResourceService: GenericResourceService,
+        private readonly accessCodesService: AccessCodesService
     ) { }
 
     @Post(':resourceType')
@@ -59,35 +69,52 @@ export class FhirController {
         @Param('id') id: string,
         @Req() req: Request & { user: any },
     ) {
+        // Log the request for debugging
+        this.logger.debug(`GET request for ${resourceType}/${id} by user ${req.user?.email} (${req.user?.role})`);
+
+        // Normalize resource ID (handle with or without 'res-' prefix)
+        const normalizedId = id.startsWith('res-') ? id : `res-${id}`;
+
         // For specific resources, check permissions based on user role
         if (req.user.role === Role.ADMIN) {
             // Admins can access any resource
-            return this.fhirService.getResource(resourceType, id);
+            return this.fhirService.getResource(resourceType, normalizedId);
         } else {
             // Other roles can access resources based on permissions
-            return this.fhirService.getResourceWithPermissionCheck(resourceType, id, req.user);
+            return this.fhirService.getResourceWithPermissionCheck(resourceType, normalizedId, req.user);
         }
     }
 
     @Put(':resourceType/:id')
-    @Roles(Role.ADMIN, Role.PRACTITIONER)
-    @ApiOperation({ summary: 'Update a FHIR resource (Admin & Practitioner only)' })
+    @Roles(Role.ADMIN, Role.PRACTITIONER, Role.PATIENT)
+    @ApiOperation({ summary: 'Update a FHIR resource' })
     @ApiParam({ name: 'resourceType', description: 'FHIR resource type (e.g., Patient, Observation)' })
     @ApiParam({ name: 'id', description: 'FHIR resource ID' })
     @ApiResponse({ status: 200, description: 'Resource updated successfully' })
     @ApiResponse({ status: 404, description: 'Resource not found' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
     updateResource(
         @Param('resourceType') resourceType: string,
         @Param('id') id: string,
         @Body() data: any,
         @Req() req: Request & { user: any },
     ) {
+        // Log the request for debugging
+        this.logger.debug(`PUT request for ${resourceType}/${id} by user ${req.user?.email} (${req.user?.role})`);
+
+        // Normalize resource ID (handle with or without 'res-' prefix)
+        const normalizedId = id.startsWith('res-') ? id : `res-${id}`;
+
+        // Ensure the resource type and ID in the body match the URL
+        data.resourceType = resourceType;
+        data.id = normalizedId;
+
         if (req.user.role === Role.ADMIN) {
-            return this.fhirService.updateResource(resourceType, id, data);
+            // Admins can update any resource
+            return this.fhirService.updateResource(resourceType, normalizedId, data);
         } else {
-            return this.fhirService.updateResourceWithPermissionCheck(resourceType, id, data, req.user);
+            // Other roles can update resources based on permissions
+            return this.fhirService.updateResourceWithPermissionCheck(resourceType, normalizedId, data, req.user);
         }
     }
 
@@ -229,6 +256,100 @@ export class FhirController {
     async getRegistry() {
         const resources = this.resourceRegistry.getRegisteredResourceTypes();
         return { resources };
+    }
+
+    @Post(':resourceType/with-access-code')
+    @Public()
+    @ApiOperation({ summary: 'Create a FHIR resource with access code for registration' })
+    @ApiParam({ name: 'resourceType', description: 'FHIR resource type (Patient or Practitioner)' })
+    @ApiResponse({ status: 201, description: 'Resource created and access code sent' })
+    @ApiResponse({ status: 400, description: 'Invalid input or resource type' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin access required' })
+    async createResourceWithAccessCode(
+        @Param('resourceType') resourceType: string,
+        @Body() resourceData: any,
+        @Query('email') email: string,
+        @Req() req: Request & { user?: any },
+    ) {
+        // Check if user is authenticated and has admin role
+        if (!req.user || req.user.role !== Role.ADMIN) {
+            throw new BadRequestException('Admin access required');
+        }
+
+        if (!email) {
+            throw new BadRequestException('Email is required for access code generation');
+        }
+
+        // Only allow Patient and Practitioner resources for this endpoint
+        const allowedResourceTypes = ['Patient', 'Practitioner'];
+        const normalizedResourceType = this.fhirService.normalizeResourceType(resourceType);
+
+        if (!allowedResourceTypes.includes(normalizedResourceType)) {
+            throw new BadRequestException(`Only ${allowedResourceTypes.join(', ')} resources can be created with access codes`);
+        }
+
+        try {
+            this.logger.log(`Creating ${normalizedResourceType} with access code for email: ${email}`);
+
+            // Ensure resourceType is set correctly
+            resourceData.resourceType = normalizedResourceType;
+
+            // Ensure the resource has the email in telecom
+            if (!resourceData.telecom) {
+                resourceData.telecom = [];
+            }
+
+            // Add email to telecom if not already present
+            const hasEmail = resourceData.telecom.some(
+                t => t.system === 'email' && t.value === email
+            );
+
+            if (!hasEmail) {
+                resourceData.telecom.push({
+                    system: 'email',
+                    value: email,
+                    use: normalizedResourceType === 'Patient' ? 'home' : 'work'
+                });
+            }
+
+            // Create the resource directly using the FHIR service
+            const createdResource = await axios.post(
+                `${this.fhirService.getBaseUrl()}/${normalizedResourceType}`,
+                resourceData,
+                {
+                    headers: {
+                        'Content-Type': 'application/fhir+json',
+                        'Accept': 'application/fhir+json'
+                    }
+                }
+            );
+
+            const resourceId = createdResource.data.id;
+
+            // Generate an access code
+            const role = normalizedResourceType.toLowerCase();
+            const accessCode = await this.accessCodesService.create({
+                role,
+                recipientEmail: email,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+                resourceId: resourceId,
+                resourceType: normalizedResourceType
+            });
+
+            this.logger.log(`Successfully created ${normalizedResourceType} resource with ID ${resourceId} and generated access code`);
+
+            return {
+                success: true,
+                data: {
+                    resource: createdResource.data,
+                    accessCode: accessCode.code
+                }
+            };
+        } catch (error) {
+            this.logger.error(`Failed to create ${normalizedResourceType} with access code: ${error.message}`);
+            throw error;
+        }
     }
 
     private getSearchParamsForResource(resourceType: string): any[] {

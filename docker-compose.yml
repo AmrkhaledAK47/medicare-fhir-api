@@ -23,7 +23,7 @@ services:
     networks:
       - medicare-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/fhir/metadata" ]
+      test: [ "CMD", "curl", "-f", "-X", "GET", "http://localhost:8080/fhir/metadata" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -66,6 +66,61 @@ services:
       - medicare-network
     environment:
       MONGO_INITDB_DATABASE: medicare
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:27017" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching
+  redis:
+    image: redis:alpine
+    container_name: medicare-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - medicare-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: medicare-prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - medicare-network
+    restart: unless-stopped
+    depends_on:
+      - nest-api
+
+  # Grafana for monitoring dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: medicare-grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - medicare-network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
 
   # NestJS API service
   nest-api:
@@ -82,18 +137,38 @@ services:
       - NODE_ENV=development
       - MONGODB_URI=mongodb://mongodb:27017/medicare
       - FHIR_SERVER_URL=http://hapi-fhir:8080/fhir
+      - FHIR_USERNAME=admin
+      - FHIR_PASSWORD=admin
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - APP_EXTERNAL_URL=http://localhost:3000/api
+      - JWT_SECRET=medicare_secure_jwt_secret_key_2025
+      - JWT_EXPIRATION=24h
     depends_on:
-      - mongodb
-      - hapi-fhir
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
+      hapi-fhir:
+        condition: service_started
     networks:
       - medicare-network
     restart: unless-stopped
     command: npm run start:dev
+    # Temporarily disable healthcheck
+    # healthcheck:
+    #   test: [ "CMD", "curl", "-f", "http://localhost:3000/health" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
 
 volumes:
   hapi-data:
   mongodb-data:
   postgres-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:
 
 
 networks:

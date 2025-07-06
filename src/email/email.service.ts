@@ -13,10 +13,10 @@ export class EmailService {
     }
 
     private async initializeTransporter() {
-        const emailConfig = this.configService.get('app.email');
+        const emailConfig = this.configService.get('app.email') || {};
 
         // Check if required email configuration is available
-        if (!emailConfig.user || !emailConfig.password) {
+        if (!emailConfig || !emailConfig.user || !emailConfig.password) {
             this.logger.warn('Email credentials not provided. Email sending will be disabled.');
             this.emailEnabled = false;
             return;
@@ -40,17 +40,70 @@ export class EmailService {
             this.emailEnabled = true;
         } catch (error) {
             this.logger.error(`Failed to establish SMTP connection: ${error.message}`);
+
+            // Provide more specific guidance for common Gmail errors
+            if (error.message.includes('Application-specific password required')) {
+                this.logger.error(`
+                Gmail security requires an app-specific password for SMTP access.
+                Please follow these steps:
+                1. Enable 2-Step Verification on your Google account
+                2. Generate an App Password at https://myaccount.google.com/apppasswords
+                3. Use that App Password in your .env file instead of your regular password
+                `);
+            } else if (error.message.includes('Invalid login')) {
+                this.logger.error('Email credentials are incorrect or not accepted by the provider');
+            }
+
             this.logger.warn('Email sending will be disabled. Using console logging instead.');
             this.emailEnabled = false;
         }
     }
 
-    async sendRegistrationCode(email: string, name: string, accessCode: string): Promise<boolean> {
+    /**
+     * Generic method to send an email
+     * 
+     * @param to Recipient email address
+     * @param subject Email subject
+     * @param html Email HTML content
+     * @returns Promise<boolean> Success status
+     */
+    async sendEmail(to: string, subject: string, html: string): Promise<boolean> {
         try {
-            const emailConfig = this.configService.get('app.email');
+            const emailConfig = this.configService.get('app.email') || {};
 
             const mailOptions = {
-                from: emailConfig.from,
+                from: emailConfig.from || 'noreply@medicare.com',
+                to: to,
+                subject: subject,
+                html: html
+            };
+
+            // Always log the email to the console for development
+            console.log(`========================================`);
+            console.log(`EMAIL SENT TO: ${to}`);
+            console.log(`SUBJECT: ${subject}`);
+            console.log(`========================================`);
+
+            // Only attempt to send email if enabled
+            if (this.emailEnabled && this.transporter) {
+                await this.transporter.sendMail(mailOptions);
+                this.logger.log(`Email sent to ${to} with subject "${subject}"`);
+            } else {
+                this.logger.warn(`Email disabled. Email to ${to} logged to console only.`);
+            }
+            return true;
+        } catch (error) {
+            this.logger.error(`Failed to send email to ${to}: ${error.message}`);
+            return false;
+        }
+    }
+
+    async sendRegistrationCode(email: string, name: string, accessCode: string): Promise<boolean> {
+        try {
+            const emailConfig = this.configService.get('app.email') || {};
+
+            const mailOptions = {
+                from: emailConfig.from || 'noreply@medicare.com',
                 to: email,
                 subject: 'Complete Your MediCare Registration',
                 html: `
@@ -122,10 +175,12 @@ export class EmailService {
         console.log(`========================================`);
 
         try {
+            const emailConfig = this.configService.get('app.email') || {};
+
             // Only attempt to send email if enabled
             if (this.emailEnabled && this.transporter) {
                 await this.transporter.sendMail({
-                    from: this.configService.get('app.email.from'),
+                    from: emailConfig.from || 'noreply@medicare.com',
                     to: email,
                     subject: subject,
                     html: html

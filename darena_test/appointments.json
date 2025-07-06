@@ -1,0 +1,632 @@
+[
+  {
+    "resourceType": "Appointment",
+    "id": "appt-9467",
+    "status": "proposed",
+    "start": "2025-07-24T18:23:22.550Z",
+    "end": "2025-07-24T18:53:22.550Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-8699",
+          "display": "Sarah Smith"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-9477",
+          "display": "Dr. Jennifer Smith"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8817",
+          "display": "MediCare Hospital"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Follow-up with Dr. Smith",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-7233",
+    "status": "booked",
+    "start": "2025-07-13T18:23:22.551Z",
+    "end": "2025-07-13T18:53:22.551Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-8699",
+          "display": "Sarah Smith"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-3885",
+          "display": "Dr. Robert Johnson"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8817",
+          "display": "MediCare Hospital"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Annual physical with Dr. Johnson",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-8917",
+    "status": "cancelled",
+    "start": "2025-06-10T18:23:22.551Z",
+    "end": "2025-06-10T18:53:22.551Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-8699",
+          "display": "Sarah Smith"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-9477",
+          "display": "Dr. Jennifer Smith"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8817",
+          "display": "MediCare Hospital"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Consultation with Dr. Smith",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-6992",
+    "status": "booked",
+    "start": "2025-07-09T18:23:22.551Z",
+    "end": "2025-07-09T18:53:22.551Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-9288",
+          "display": "Michael Johnson"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-9477",
+          "display": "Dr. Jennifer Smith"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8817",
+          "display": "MediCare Hospital"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Follow-up with Dr. Smith",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-6501",
+    "status": "fulfilled",
+    "start": "2025-06-15T18:23:22.551Z",
+    "end": "2025-06-15T18:53:22.551Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-9288",
+          "display": "Michael Johnson"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-9477",
+          "display": "Dr. Jennifer Smith"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8709",
+          "display": "MediCare Clinic"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Annual physical with Dr. Smith",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-3425",
+    "status": "cancelled",
+    "start": "2025-06-09T18:23:22.551Z",
+    "end": "2025-06-09T18:53:22.551Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-9288",
+          "display": "Michael Johnson"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-9477",
+          "display": "Dr. Jennifer Smith"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8709",
+          "display": "MediCare Clinic"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Consultation with Dr. Smith",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-3763",
+    "status": "proposed",
+    "start": "2025-07-29T18:23:22.551Z",
+    "end": "2025-07-29T18:53:22.551Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-7568",
+          "display": "Jessica Williams"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-9477",
+          "display": "Dr. Jennifer Smith"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8817",
+          "display": "MediCare Hospital"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Follow-up with Dr. Smith",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-5703",
+    "status": "fulfilled",
+    "start": "2025-06-24T18:23:22.551Z",
+    "end": "2025-06-24T18:53:22.551Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-7568",
+          "display": "Jessica Williams"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-7501",
+          "display": "Dr. Elizabeth Davis"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8709",
+          "display": "MediCare Clinic"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Annual physical with Dr. Davis",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-2667",
+    "status": "fulfilled",
+    "start": "2025-06-28T18:23:22.551Z",
+    "end": "2025-06-28T18:53:22.551Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-7568",
+          "display": "Jessica Williams"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-7501",
+          "display": "Dr. Elizabeth Davis"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8817",
+          "display": "MediCare Hospital"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Consultation with Dr. Davis",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-9367",
+    "status": "booked",
+    "start": "2025-07-21T18:23:22.551Z",
+    "end": "2025-07-21T18:53:22.551Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-9912",
+          "display": "Robert Brown"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-7501",
+          "display": "Dr. Elizabeth Davis"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8817",
+          "display": "MediCare Hospital"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Follow-up with Dr. Davis",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-0705",
+    "status": "cancelled",
+    "start": "2025-06-24T18:23:22.551Z",
+    "end": "2025-06-24T18:53:22.551Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-9912",
+          "display": "Robert Brown"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-7501",
+          "display": "Dr. Elizabeth Davis"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8817",
+          "display": "MediCare Hospital"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Annual physical with Dr. Davis",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-3102",
+    "status": "proposed",
+    "start": "2025-07-16T18:23:22.552Z",
+    "end": "2025-07-16T18:53:22.552Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-9912",
+          "display": "Robert Brown"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-3885",
+          "display": "Dr. Robert Johnson"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8709",
+          "display": "MediCare Clinic"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Consultation with Dr. Johnson",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-3778",
+    "status": "proposed",
+    "start": "2025-07-21T18:23:22.552Z",
+    "end": "2025-07-21T18:53:22.552Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-0510",
+          "display": "James Jones"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-9477",
+          "display": "Dr. Jennifer Smith"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8709",
+          "display": "MediCare Clinic"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Follow-up with Dr. Smith",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-1496",
+    "status": "cancelled",
+    "start": "2025-06-28T18:23:22.552Z",
+    "end": "2025-06-28T18:53:22.552Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-0510",
+          "display": "James Jones"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-7501",
+          "display": "Dr. Elizabeth Davis"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8709",
+          "display": "MediCare Clinic"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Annual physical with Dr. Davis",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceType": "Appointment",
+    "id": "appt-6703",
+    "status": "booked",
+    "start": "2025-07-17T18:23:22.552Z",
+    "end": "2025-07-17T18:53:22.552Z",
+    "participant": [
+      {
+        "actor": {
+          "reference": "Patient/patient-0510",
+          "display": "James Jones"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Practitioner/pract-7501",
+          "display": "Dr. Elizabeth Davis"
+        },
+        "status": "accepted"
+      },
+      {
+        "actor": {
+          "reference": "Location/loc-8709",
+          "display": "MediCare Clinic"
+        },
+        "status": "accepted"
+      }
+    ],
+    "description": "Consultation with Dr. Davis",
+    "serviceType": [
+      {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "124",
+            "display": "General Practice"
+          }
+        ]
+      }
+    ]
+  }
+]

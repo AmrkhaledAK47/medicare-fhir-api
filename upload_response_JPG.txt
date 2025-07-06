@@ -1,0 +1,47 @@
+Note: Unnecessary use of -X or --request, POST is already inferred.
+*   Trying 127.0.0.1:3000...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Connected to localhost (127.0.0.1) port 3000 (#0)
+> POST /api/brain-tumor/upload?patientId=422 HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/7.81.0
+> Accept: */*
+> Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODY0NmIzZGQwMzY4OGEzNDI5YjUzZjAiLCJlbWFpbCI6InBhdGllbnRAZXhhbXBsZS5jb20iLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc1MTcxMjYxNSwiZXhwIjoxNzUxNzk5MDE1fQ.6_qHJthKgm9yP_TK460t7uJoJpjZcR6y-OBvLZ3FSsc
+> Content-Length: 436622
+> Content-Type: multipart/form-data; boundary=------------------------9d071e8bd5e5ae0d
+> 
+} [65536 bytes data]
+* We are completely uploaded and fine
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 201 Created
+< Vary: Origin, Accept-Encoding
+< Access-Control-Allow-Credentials: true
+< Access-Control-Expose-Headers: Content-Disposition
+< Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+< Cross-Origin-Opener-Policy: same-origin
+< Cross-Origin-Resource-Policy: same-origin
+< Origin-Agent-Cluster: ?1
+< Referrer-Policy: no-referrer
+< Strict-Transport-Security: max-age=15552000; includeSubDomains
+< X-Content-Type-Options: nosniff
+< X-DNS-Prefetch-Control: off
+< X-Download-Options: noopen
+< X-Frame-Options: SAMEORIGIN
+< X-Permitted-Cross-Domain-Policies: none
+< X-XSS-Protection: 0
+< X-Correlation-ID: medicare-1751712646397-03d807d4
+< X-RateLimit-Limit: 30
+< X-RateLimit-Remaining: 29
+< X-RateLimit-Reset: 0
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 376
+< ETag: W/"178-zVOvLmoh6Nv2yW054VCmXeI/u2w"
+< Date: Sat, 05 Jul 2025 10:50:46 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+< 
+{ [376 bytes data]
+100  426k  100   376  100  426k  13512  14.9M --:--:-- --:--:-- --:--:-- 15.4M
+* Connection #0 to host localhost left intact
+{"success":true,"data":{"patientId":"422","scanImagePath":"/brain-scans/1751712646407-brain-tumor-mri-2.jpg","thumbnailPath":"/brain-scans/thumbnails/thumb-1751712646407-brain-tumor-mri-2.jpg","status":"pending","tumorDetected":false,"_id":"6869038681c95f440816b806","tumorBoundingBox":[],"createdAt":"2025-07-05T10:50:46.421Z","updatedAt":"2025-07-05T10:50:46.421Z","__v":0}}

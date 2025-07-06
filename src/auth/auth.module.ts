@@ -10,19 +10,21 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { EmailModule } from '../email/email.module';
+import { AccessCodesModule } from '../access-codes/access-codes.module';
 
 @Module({
     imports: [
         UsersModule,
         PassportModule,
         EmailModule,
+        AccessCodesModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: async (configService: ConfigService) => ({
-                secret: configService.get<string>('app.jwt.secret'),
+                secret: configService.get<string>('JWT_SECRET'),
                 signOptions: {
-                    expiresIn: configService.get<string>('app.jwt.expiresIn', '7d'),
+                    expiresIn: configService.get<string>('JWT_EXPIRATION', '7d'),
                 },
             }),
         }),

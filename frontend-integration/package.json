@@ -1,0 +1,33 @@
+{
+  "name": "medicare-fhir-api-frontend-integration",
+  "version": "1.0.0",
+  "description": "Frontend integration package for MediCare FHIR API",
+  "main": "test_frontend_auth.js",
+  "scripts": {
+    "test": "node test_frontend_auth.js"
+  },
+  "keywords": [
+    "fhir",
+    "healthcare",
+    "authentication",
+    "api"
+  ],
+  "author": "MediCare Backend Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.4.0"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  }
+}

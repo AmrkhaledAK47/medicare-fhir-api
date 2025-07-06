@@ -1,0 +1,1 @@
+{"resourceType":"OperationOutcome","issue":[{"severity":"warning","code":"conflict","diagnostics":"User with this email already exists","details":{"text":"User with this email already exists"}}]}

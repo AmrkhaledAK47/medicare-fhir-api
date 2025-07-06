@@ -1,0 +1,11 @@
+--- brain-tumor.service.ts.old	2025-07-05 03:45:00.000000000 +0000
++++ brain-tumor.service.ts	2025-07-05 03:45:00.000000000 +0000
+@@ -280,7 +280,7 @@
+                                     display: 'Detection Confidence',
+                                 },
+                             ],
+-                            valueDecimal: brainScan.confidence,
++                            valueQuantity: { value: brainScan.confidence },
+                         },
+                     ],
+                 };
